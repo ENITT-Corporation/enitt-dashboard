@@ -1,0 +1,80 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<div class="tab_div" id="eventDiv">
+	<table class="tstyle_list">
+		<colgroup>
+			<col width="20%">
+			<col width="20%">
+			<col width="20%">
+			<col width="20%">
+			<col width="20%">
+		</colgroup>
+		<thead>
+			<tr>
+	          	<th>초기 발생시간</th>
+	            <th>롤러 ID</th>
+	            <th>종류</th>
+	            <th>감지 횟수</th>
+	            <th>상태</th>
+	        </tr>
+		</thead>
+		<tbody>
+			<c:choose>
+            	<c:when test="${commonVO.totalCount > 0}">
+					<c:set var="num" value ="${commonVO.totalCount - ((commonVO.pageNo - 1) * commonVO.pageSize) }"/>          			
+					<c:forEach var="data" items="${eventList}" varStatus="status">
+		               	<tr class="<c:out value="${commonVO.dashboard_dasEventId eq data.eventId ? 'selected' : ''}" />" id="<c:out value="${data.eventId}" />" >				               		
+		                	<td><c:out value="${data.eventTime}" /></td>
+		                  	<td><c:out value="${data.eventLocation}" /></td>
+		                  	<td><c:out value="${data.eventCodeName}" /></td>
+		                  	<td><c:out value="${data.eventLogCount}" /></td>
+		                  	<td>
+		                  		<c:choose>
+		                  			<c:when test="${data.eventStateCode eq 'STATE_01'}">
+		                  				<p class="error event_list_btn" onclick="ajaxPopupOpen('<c:out value="${data.eventId}" />','<c:out value="${data.eventStateCode}" />','dashStatePopup');"><c:out value="${data.eventStateCodeName}" /></p>
+		                  			</c:when>
+		                  			<c:when test="${data.eventStateCode eq 'STATE_02'}">
+		                  				<p class="processing event_list_btn" onclick="ajaxPopupOpen('<c:out value="${data.eventId}" />','<c:out value="${data.eventStateCode}" />','dashStatePopup');"><c:out value="${data.eventStateCodeName}" /></p>
+		                  			</c:when>		                  		
+		                  		</c:choose>                  		
+		                  	</td>		                  	
+		                </tr>
+		                <c:set var="num" value ="${num-1}"/>
+					</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<!-- <tr class="noData">
+						<td colspan="5" class="TxtC">데이터가 없습니다.</td>
+					</tr> -->
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</c:otherwise> 
+			</c:choose>
+		</tbody>
+	</table>
+</div>
+
+<script src='<c:out value="${pageContext.request.contextPath}" />/resources/js/custom/dashboard/event_list.js'></script>

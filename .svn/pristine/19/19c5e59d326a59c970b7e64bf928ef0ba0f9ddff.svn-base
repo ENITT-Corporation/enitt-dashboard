@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.enitt.poscoWebSystem.dao.ConveyorDAO">
+	
+	<select id="getConveyorList" parameterType="CommonVO" resultType="ConveyorVO">
+		<![CDATA[ 
+			SELECT
+						CL.conveyor_id			AS conveyorId
+						,CL.conveyor_type 		AS conveyorType
+						,CL.conveyor_state		AS conveyorState
+						,C.code_name			AS conveyorStateNm
+						,CL.conveyor_state_time	AS conveyorStateTime
+						,TIMESTAMPDIFF(
+												HOUR 
+												, CL.conveyor_state_time
+							 					,IFNULL(
+															(
+																SELECT 
+																			A.conveyor_state_time 
+																FROM 		tb_conveyor_log A 
+																WHERE 	A.conveyor_state_time > CL.conveyor_state_time 
+																LIMIT 1
+															)
+															,NOW()
+														)
+											) 	AS conveyorTimeDiff
+			FROM 		tb_conveyor_log CL
+			LEFT JOIN 	tb_code C
+			ON			(C.code_id = CL.conveyor_state AND	C.parent_code_id = 'SYS_STATE') 
+			WHERE		1=1
+		]]>
+		<if test='state != null and  state != "" '>
+			<![CDATA[ AND CL.conveyor_state = #{state} ]]>
+		</if>
+		<if test='timeStart != null and  timeStart != "" '>
+			<![CDATA[ AND CL.conveyor_state_time >=  DATE_FORMAT(#{timeStart} , '%Y-%m-%d %H:%i:%s') ]]>
+		</if>
+		<if test='timeEnd != null and  timeEnd != "" '>
+			<![CDATA[ AND CL.conveyor_state_time <=  DATE_FORMAT(#{timeEnd} , '%Y-%m-%d %H:%i:%s') ]]>
+		</if>
+		<![CDATA[ 
+			ORDER BY 	CL.conveyor_state_time
+		]]>
+	</select>
+	
+	<select id="getConveyorPagingList" parameterType="CommonVO" resultType="ConveyorVO">
+		<![CDATA[ 
+			SELECT
+						CL.conveyor_id			AS conveyorId
+						,CL.conveyor_type 		AS conveyorType
+						,CL.conveyor_state		AS conveyorState
+						,C.code_name			AS conveyorStateNm
+						,CL.conveyor_state_time	AS conveyorStateTime
+						,TIMESTAMPDIFF(
+												HOUR 
+												, CL.conveyor_state_time
+							 					,IFNULL(
+															(
+																SELECT 
+																			A.conveyor_state_time 
+																FROM 		tb_conveyor_log A 
+																WHERE 	A.conveyor_state_time > CL.conveyor_state_time 
+																LIMIT 1
+															)
+															,NOW()
+														)
+											) 	AS conveyorUptime
+			FROM 		tb_conveyor_log CL
+			LEFT JOIN 	tb_code C
+			ON			(C.code_id = CL.conveyor_state AND	C.parent_code_id = 'SYS_STATE') 
+			WHERE		1=1
+		]]>
+		<if test='state != null and  state != "" '>
+			<![CDATA[ AND CL.conveyor_state = #{state} ]]>
+		</if>
+		<if test='timeStart != null and  timeStart != "" '>
+			<![CDATA[ AND CL.conveyor_state_time >=  DATE_FORMAT(#{timeStart} , '%Y-%m-%d %H:%i:%s') ]]>
+		</if>
+		<if test='timeEnd != null and  timeEnd != "" '>
+			<![CDATA[ AND CL.conveyor_state_time <=  DATE_FORMAT(#{timeEnd} , '%Y-%m-%d %H:%i:%s') ]]>
+		</if>
+		<![CDATA[ 
+			ORDER BY 	CL.conveyor_state_time
+			LIMIT 		${startNum}, ${pageSize}
+		]]>
+	</select>
+	
+	<select id="getConveyorListCnt" parameterType="CommonVO" resultType="int">
+		<![CDATA[ 
+			SELECT
+						COUNT(0) 
+			FROM 		tb_conveyor_log CL
+			LEFT JOIN 	tb_code C
+			ON			(C.code_id = CL.conveyor_state AND	C.parent_code_id = 'SYS_STATE') 
+			WHERE		1=1
+		]]>
+		<if test='state != null and  state != "" '>
+			<![CDATA[ AND CL.conveyor_state = #{state} ]]>
+		</if>
+		<if test='timeStart != null and  timeStart != "" '>
+			<![CDATA[ AND CL.conveyor_state_time >=  DATE_FORMAT(#{timeStart} , '%Y-%m-%d %H:%i:%s') ]]>
+		</if>
+		<if test='timeEnd != null and  timeEnd != "" '>
+			<![CDATA[ AND CL.conveyor_state_time <=  DATE_FORMAT(#{timeEnd} , '%Y-%m-%d %H:%i:%s') ]]>
+		</if>
+	</select>
+</mapper>

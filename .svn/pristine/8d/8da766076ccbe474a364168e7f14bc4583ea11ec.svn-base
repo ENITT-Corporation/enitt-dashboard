@@ -1,0 +1,98 @@
+$(document).ready(function(){
+	// 장비 상태 1분마다 갱신
+	fncSetting();
+	setInterval(equipmentState, 60000);
+	setInterval(conveyorState, 60000);
+	setInterval(eventCnt, 3000);
+});
+
+var dashboard_dasEventId="";
+var dashboard_dasEventCnt = 0;
+var dashEventState="";
+var alarmIdx=0;
+
+function fncSetting() {
+	equipmentState();
+	conveyorState();
+	eventCnt();
+}
+
+// 장비 상태
+function equipmentState() {                                                                                                                                                                                                                                                                     
+	var param = {};
+	rAjaxCall.asyncH("/dashboard/content/equipmentState", 'POST', param, function(data) {
+		$('.equipment').html("");
+		$('.equipment').html(data);
+	});
+}
+
+// 컨베이어 벨트 상태
+function conveyorState() {
+	var param = {};
+	rAjaxCall.asyncH("/dashboard/content/conveyorState", 'POST', param, function(data) {
+		$('.conveyor_popup').html("");
+		$('.conveyor_popup').html(data);
+	});
+}
+
+// 발생된 이벤트 개수
+function eventCnt() {
+	var param = {
+		"dashboard" : "Y"
+		, "eventLastTime" : $("#eventLastTime").val()
+	};
+	
+	rAjaxCall.async("/dashboard/ajaxEventCnt", 'POST', param, function(data) {
+		if(data.eventNewCnt > 0){ // 새로운 이벤트가 들어왔을 경우
+			dasEvent();
+		} else { // 새로운 이벤트가 없을 경우
+			if(data.eventCnt == 0){ // 기존 이벤트 개수가 변함이 없을 경우 (= 대시보드에서 상태가 변경됐을 경우)
+				
+			} else {
+				if(dashboard_dasEventCnt != data.eventCnt) { // 이벤트 개수가 맞지 않았을 경우
+					dasEvent();
+				}
+			}
+		}
+		dashboard_dasEventCnt = data.eventCnt;
+	});
+}
+
+// 페이지 로딩 시, 새로 들어 온 이벤트 아이콘 및 메시지 노출
+function dasEvent() {
+	var param = {
+		"dashboard" : "Y"
+		, "eventLastTime" : $("#eventLastTime").val()
+		, "dashboard_dasEventId" : dashboard_dasEventId
+	};
+
+	rAjaxCall.asyncH("/dashboard/content/ajaxEvent", 'POST', param, function(data) {
+		$('.das_event').html("");
+		$('.das_event').html(data);
+		
+		rAjaxCall.asyncH("/dashboard/content/ajaxEventList", 'POST', param, function(data) {
+			$('.dash_box_content').html("");
+			$('.dash_box_content').html(data);
+			
+			rAjaxCall.asyncH("/dashboard/content/ajaxEventAlarm", 'POST', param, function(data) {
+				$('.event_popup_div').html("");
+				$('.event_popup_div').html(data);
+					
+				// 대시보드에서 상태 변경 시, 알림 메시지, 상태 변경 보여주기
+				if(dashEventState == 'Y') {
+					$("#eventDiv > table > tbody > tr:eq("+alarmIdx+")").trigger("click");
+					dashEventState = "";
+				} else {
+					$("#eventDiv > table > tbody > tr:eq(0)").trigger("click");
+				}
+			});
+		});
+		
+	});	
+}
+
+
+
+
+
+

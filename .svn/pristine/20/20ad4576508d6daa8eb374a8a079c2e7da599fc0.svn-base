@@ -1,0 +1,42 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<section class="content">
+	<div class="conveyor_page">
+		<div class="conveyor_title">
+			<span>컨베이어 이력</span>
+		</div>
+		<form action="/conveyorSearch" id="conveyorSearch" name="search_form" method="post">
+			<input type="hidden" name="pageNo" value="1"/>
+			<input type="hidden" name="pageSize" value="<c:out value="${commonVO.pageSize}" />" />
+			<input type="hidden" name="mode" value="list" />
+			
+			<div class="search_area">
+	 			<div class="search_area_row">  
+					<label for="eventState">상태</label>
+					<select name="eventState">
+						<option value="전체">전체</option>
+						<option value="발생">발생</option>
+						<option value="처리중">처리중</option>
+						<option value="처리완료">처리완료</option>
+						<c:forEach var="data" items="${eventStateSearchList}" varStatus="status">
+			            	<option value="<c:out value="${data.codeId}" />" <c:out value="${commonVO.eventState eq data.codeId ? 'selected=selected':'' }" />>
+			            		<c:out value="${data.codeName}" />
+			            	</option>
+				        </c:forEach>
+					</select>
+					<label for="eventTimeStart">시간</label>
+					<input type="text" class="Wd120" name="eventTimeStart" id="timeStart" value="<c:out value="${commonVO.eventTimeStart}" />" />
+	                 &nbsp;&nbsp;&nbsp; ~ &nbsp;
+	               	<input type="text" class="Wd120" name="eventTimeEnd" id ="timeEnd" value="<c:out value="${commonVO.eventTimeEnd}" />" />
+	               	<label for="eventLocationStart">구간</label>
+	               	<input type="text" class="Wd80" name="eventLocationStart" value="<c:out value="${commonVO.eventLocationStart}" />" maxlength="4" onKeyUp="onlyNumber(this);" placeholder="전체" /> m
+	               	 &nbsp;&nbsp;&nbsp; ~ &nbsp;
+	               	<input type="text" class="Wd80" name="eventLocationEnd" value="<c:out value="${commonVO.eventLocationEnd}" />"  maxlength="4" onKeyUp="onlyNumber(this);" placeholder="전체" /> m
+					
+					<button type="button" class="btn_search" onclick="goSearch();">검색</button>
+				</div>  
+			</div>
+		</form>
+	</div>
+</section>

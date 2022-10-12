@@ -1,0 +1,33 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<%-- <c:set var="msgStartWidth" value="${450}" />
+<c:set var="msgEndWidth" value="${1750}" />
+<c:set var="Width" value="${1300}" /> --%>
+	<%-- <c:set var="msg_right" value="${msgEndWidth-(Width/1000*data.eventLocation)-msgStartWidth}" /> --%>
+	<c:forEach var="data" items="${dasEventList}" varStatus="status"> 
+		<div class="event_msg <c:out value="${commonVO.dashboard_dasEventId eq data.eventId ? 'selected':''}" /> <c:out value="${data.eventStateCode}" />" id="<c:out value="${data.eventId}" />" style="right:<c:out value="${data.locationRight}" />px; bottom:<c:out value="${data.locationBottom}" />px;">
+			<div class="event_msg_title <c:out value="${data.eventStateCode}" />">
+				<p>이벤트 발생</p>
+			</div>
+			<ul>
+				<li>
+					<span>발생시간 : </span>
+					<span><c:out value="${data.eventTime}" /></span>
+				</li>
+				<li>
+					<span>이벤트 상태 : </span>
+					<span class="<c:out value="${data.eventCode}" />"><c:out value="${data.eventCodeName}" /></span>
+				</li>
+				<li>
+					<span>처리 상태 : </span>
+					<span class="<c:out value="${data.eventStateCode}" />"><c:out value="${data.eventStateCodeName}" /></span>
+				</li>
+				<li>
+					<span>롤러 ID : </span>
+					<span><c:out value="${data.eventLocation}" /></span>
+				</li>
+			</ul>
+			<div class="exe_<c:out value="${data.eventStateCode}" />" onclick="ajaxExecuteExeFile();"></div>
+		</div>
+	</c:forEach> 						

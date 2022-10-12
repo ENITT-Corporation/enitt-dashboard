@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.enitt.poscoWebSystem.dao.DashboardDAO">
+	<sql id="base_event_column"> 
+		E.event_id	AS eventId
+		,E.event_code	AS eventCode
+		,E.event_time	AS eventTime
+		,E.event_location	AS eventLocation
+		,E.register_date	AS eventRegisterDate
+	</sql>
+	
+	<sql id="base_event_state_column">
+		ES.event_state_id     AS eventStateId
+		,ES.event_id	      AS eventId
+		,ES.event_state_code	      AS eventStateCode
+		,ES.event_state_note   AS eventStateNote
+		,ES.register_date      AS eventStateRegisterDate
+		,ES.register_id	      AS registerId
+		,ES.register_ip	      AS registerIp
+	</sql>
+	
+	<sql id="base_conveyor_column">
+		C.conveyor_id AS conveyorId
+		, C.conveyor_state AS conveyorState
+		, C.conveyor_state_time AS conveyorStateTime
+	</sql>
+	
+	<sql id="base_equipment_column">
+		ES.equipment_log_id AS equipmentLogId
+		, ES.equipment_name AS equipmentName
+		, ES.equipment_state AS equipmentState
+		, ES.equipment_note AS equipmentNote
+		, ES.equipment_state_time AS equipmentStateTime
+	</sql>
+	
+	<!-- 이벤트 목록 -->
+	<select id="getEventList" resultType="CommonVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		,<include refid="base_event_state_column" />
+			<![CDATA[
+				,C.code_name AS eventCodeName
+				FROM tb_event E
+				JOIN (SELECT *
+						FROM   tb_event_state_log
+						WHERE  event_state_id IN
+						       (SELECT  MAX(event_state_id)
+						       FROM     tb_event_state_log
+						       GROUP BY event_id
+						       )
+						AND NOT event_state_code IN ('STATE_03')
+						) ES
+				ON E.event_id = ES.event_id
+				JOIN tb_code C
+				ON ES.event_state_code = C.code_id
+				ORDER BY E.event_time DESC
+			]]>
+	</select>
+
+	<!-- 컨베이어 벨트 상태  -->
+	<select id="getConveyorState" resultType="ConveyorVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_conveyor_column" />
+		<![CDATA[
+			FROM tb_conveyor_log C
+			ORDER BY conveyor_state_time DESC
+			LIMIT 1
+		]]>
+	</select>
+	
+	<select id="getEquipmentState" resultType="EquipmentVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_equipment_column" />
+		<![CDATA[
+			FROM tb_equipment_state_log ES
+			ORDER BY equipment_state_time DESC
+			LIMIT 1
+		]]>
+	</select>
+</mapper>

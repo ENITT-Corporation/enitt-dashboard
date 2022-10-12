@@ -1,0 +1,119 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.service.CodeService;
+import kr.co.enitt.poscoWebSystem.service.MemberService;
+import kr.co.enitt.poscoWebSystem.util.AuthenticateHelper;
+import kr.co.enitt.poscoWebSystem.util.CryptoUtil;
+import kr.co.enitt.poscoWebSystem.util.ObjectUtil;
+import kr.co.enitt.poscoWebSystem.util.SessionScopeUtil;
+import kr.co.enitt.poscoWebSystem.vo.CodeVO;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+import kr.co.enitt.poscoWebSystem.vo.SampleVO;
+
+@Controller
+@RequestMapping("/member")
+public class MemberController {
+	
+	@Autowired
+	private MemberService memberService;
+	
+	@Resource(name = "codeService")
+	private CodeService codeService;
+
+	
+	@RequestMapping(value= {"","/"})
+	public ModelAndView getMemberPage(HttpServletRequest request, CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+		
+		//목록 갯수
+		int cnt = memberService.getMemberListCnt(vo);
+		vo.setTotalCount(cnt);
+		//목록
+		List<MemberVO> list = memberService.getMemberList(vo);
+		mav.addObject("list", list);
+
+		mav.addObject("commonVO", vo);
+		mav.setViewName("member/list");
+		return mav;
+	}
+	
+	@RequestMapping("/ajaxMemberDetail")
+	public ModelAndView ajaxMemberDetail(HttpServletRequest request, MemberVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+		
+		//상세
+		MemberVO detail = memberService.getMemberDetail(vo);
+		mav.addObject("detail", detail);
+
+		// 검색 조건 목록
+		CommonVO commonVO = new CommonVO();
+		commonVO.setParentCode("AUTH");
+		List<CodeVO> authList = codeService.getCodeList(commonVO);
+		mav.addObject("authList", authList);
+
+		mav.setViewName("member/content/detail");
+		return mav;
+	}
+	
+	@RequestMapping("/ajaxMemberInsert")
+	public ModelAndView ajaxMemberInsert(HttpServletRequest request, MemberVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+		
+		//등록
+		memberService.setMemberInsert(vo);
+		
+		//상세
+		MemberVO detail = memberService.getMemberDetail(vo);
+		mav.addObject("detail", detail);
+
+		// 검색 조건 목록
+		CommonVO commonVO = new CommonVO();
+		commonVO.setParentCode("AUTH");
+		List<CodeVO> authList = codeService.getCodeList(commonVO);
+		mav.addObject("authList", authList);
+
+		mav.setViewName("member/content/detail");
+		return mav;
+	}
+	
+	@RequestMapping("/ajaxMemberUpdate")
+	public ModelAndView ajaxMemberUpdate(HttpServletRequest request, MemberVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+		
+		//등록
+		memberService.setMemberUpdate(vo);
+		
+		//상세
+		MemberVO detail = memberService.getMemberDetail(vo);
+		mav.addObject("detail", detail);
+
+		// 검색 조건 목록
+		CommonVO commonVO = new CommonVO();
+		commonVO.setParentCode("AUTH");
+		List<CodeVO> authList = codeService.getCodeList(commonVO);
+		mav.addObject("authList", authList);
+
+		mav.setViewName("member/content/detail");
+		return mav;
+	}
+	
+}

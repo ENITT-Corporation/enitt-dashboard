@@ -1,0 +1,39 @@
+package kr.co.enitt.poscoWebSystem.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.enitt.poscoWebSystem.dao.AttachDAO;
+import kr.co.enitt.poscoWebSystem.service.AttachService;
+import kr.co.enitt.poscoWebSystem.vo.FileUtilVO;
+import kr.co.enitt.poscoWebSystem.vo.FileVO;
+
+@Service("AttachService")
+public class AttachServiceImpl implements AttachService{
+
+	@Autowired
+	private AttachDAO attachDAO;
+	
+	@Override
+	public void createFile(List<Map<String, Object>> list) throws Exception{
+		attachDAO.createFile(list);
+	}
+	
+	@Override
+	public List<FileVO> getFileList(FileUtilVO fileUtilVO) throws Exception {
+		return attachDAO.getFileList(fileUtilVO);
+	}
+	
+	@Override
+	public void deleteFile(FileVO fileVO) throws Exception{
+		attachDAO.deleteFile(fileVO);
+	}
+
+	@Override
+	public int updateIdx(FileVO fileVO) throws Exception {
+		return attachDAO.updateIdx(fileVO);
+	}
+}

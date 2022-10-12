@@ -1,0 +1,61 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.service.DashboardService;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.FileUtilVO;
+
+
+/**
+* @Project : safetyControlSystem
+* @FileName : DashboardController.java
+* @Author : ENITT_KEJ
+* @Date : 2020. 11. 20. 
+* @Description : 대시보드
+* ===========================================================
+* DATE                   AUTHOR                     NOTE
+* -----------------------------------------------------------
+* 2020. 11. 20.       ENITT      최초작성
+*/
+@Controller 
+@RequestMapping("/dashboard")
+public class DashboardController {
+
+	private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
+	
+	@Resource(name = "DashboardService")
+	private DashboardService dashboardService;
+		
+	/**
+	  * @Method_Name : main
+	  * @retuen :ModelAndView
+	  * @Date : 2020. 11. 20.
+	  * @Author : ENITT_KEJ
+	  * @Method_Description : 대시보드 화면 호출
+	  * ---------------------
+	  * @변경이력
+	  * 2020. 11. 20. ENITT_KEJ : 생성
+	  */
+	@RequestMapping(value= {"","/"})
+	public ModelAndView main(HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+		FileUtilVO fileUtilVO = new FileUtilVO();
+		
+		fileUtilVO.setMode("create");
+		fileUtilVO.setFTypeName("excel");
+		
+		mav.addObject("FileUtilVO", fileUtilVO);
+		mav.setViewName("dashboard/form");    
+		return mav;
+	}	
+}

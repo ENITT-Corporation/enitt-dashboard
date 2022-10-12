@@ -1,0 +1,64 @@
+$(document).ready(function(){
+	$('#loginId').focus();
+	
+	var loginValidHandler = new SimpleValidation("#frmLogin", {
+		"memberId": {
+			"required" : {"value" : true, "message": "아이디를 입력 해 주세요."},
+			"maxlength": {"value": 20, "message": "최대 20글자만 가능합니다."},
+		},
+		"memberPwd": {
+			"required" : {"value" : true, "message": "비밀번호를 입력 해 주세요."},
+			"maxlength": {"value": 20, "message": "최대 20글자만 가능합니다."},
+		}
+	});
+	
+	$("#frmLogin").on("submit", function(e) {
+		var inValid = loginValidHandler.valid(null, e);
+		if (inValid) {
+			alert(inValid);
+			return false;
+		}
+		
+		// 화면 > Controller : 비밀번호 + 밀리세컨(salt) : 암호화하여 전송
+		var date = new Date();
+		var hashedPassword = ""+date.getMilliseconds();
+		var message = $("#memberPwd").val();
+		var encrypt = CryptoJS.AES.encrypt(message,hashedPassword);
+		
+		$("#memberPwd").val(encrypt);
+		$("input[name=now]").val(hashedPassword);	
+	});
+	
+	if($("#memberId").val() != ""){
+		$("#memberId").css("background-color","#6D6D6D");
+		$("#memberId").css("color","white");
+	}else{
+		$("#memberId").css("background-color","white");
+		$("#memberId").css("color","black");
+	}
+	if($("#memberPwd").val() != ""){
+		$("#memberPwd").css("background-color","#6D6D6D");
+		$("#memberPwd").css("color","white");
+	}else{
+		$("#memberPwd").css("background-color","white");
+		$("#memberPwd").css("color","black");
+	}
+	
+	$(".form-control").on("focusout",function(){
+		if($("#memberId").val() != ""){
+			$("#memberId").css("background-color","#6D6D6D");
+			$("#memberId").css("color","white");
+		}else{
+			$("#memberId").css("background-color","white");
+			$("#memberId").css("color","black");
+		}
+		if($("#memberPwd").val() != ""){
+			$("#memberPwd").css("background-color","#6D6D6D");
+			$("#memberPwd").css("color","white");
+		}else{
+			$("#memberPwd").css("background-color","white");
+			$("#memberPwd").css("color","black");
+		}
+	})
+	
+});

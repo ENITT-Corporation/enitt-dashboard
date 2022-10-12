@@ -1,0 +1,56 @@
+$(document).ready(function(){
+	// 이벤트 목록 row
+	$("#eventDiv > table > tbody > tr").on({ 
+		mouseleave: function() {
+			var idx = $(this).index();
+			$(this).removeClass("on");
+			//$(".das_event > ul > li:eq("+idx+")").removeClass("on");
+			$(".event_popup_focus").html("");
+		},
+		mouseover: function() {		
+			var idx = $(this).index();
+			$(this).addClass("on");
+			//$(".das_event > ul > li:eq("+idx+")").addClass("on");
+			
+			var eventAlarmHtml = $(".event_popup_div > .event_popup")[idx].outerHTML;
+			$(".event_popup_focus").html(eventAlarmHtml);
+		},
+		click: function() {
+			var idx = $(this).index();
+			alarmIdx = $(this).index();
+			var thisId = $(this).attr("id");
+			// 이벤트 알림 팝업 HTML
+			var eventAlarmHtml = $(".event_popup_div > .event_popup")[idx].outerHTML;
+			// 이벤트 알림 팝업 ID
+			var clickId = $("#eventDiv > table > tbody > tr.selected").attr("id");
+
+			if(thisId == clickId){
+				$(this).removeClass("selected");	
+				//$(".das_event > ul > li:eq("+idx+")").removeClass("selected");
+				$("#eventDiv > table > tbody > tr:eq("+idx+")").removeClass("selected");
+				$(".event_popup_click").html("");
+
+				dashboard_dasEventId = "";
+			}else{
+				$(".das_event > ul > li").removeClass("selected");
+				$("#eventDiv > table > tbody > tr").removeClass("selected");
+				
+				$(this).addClass("selected");	
+				//$(".das_event > ul > li:eq("+idx+")").addClass("selected");
+				$(".event_popup_click").html(eventAlarmHtml);
+				
+				dashboard_dasEventId = thisId;
+			}
+			
+		}
+	});
+});
+
+
+
+
+
+
+
+
+

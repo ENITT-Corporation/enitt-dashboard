@@ -1,0 +1,24 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+<div class="con">
+	<section class="dashboard_content">
+		<div class="dash_left_box" id="dashboardDiv">
+			<jsp:include page="./content/dashboard2.jsp" />
+		</div>
+		<div class="dash_right_box">
+			<div class="dash_right_top_box">
+				<button type="button" onclick="ajaxExecuteExeFile();">exe실행</button>
+				<!-- <p class="clock"></p> -->
+			</div>
+			<div class="dash_right_bm_box">
+				<div class="dash_box_title">
+					<p>이벤트 목록</p>
+				</div>
+				<div class="dash_box_content">
+					<jsp:include page="./content/event_list.jsp" />
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
+<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/custom/dashboard/main.js"></script>

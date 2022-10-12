@@ -1,0 +1,38 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+<header id="header">
+	<div class="home">
+		<a href="/Dashboard"></a>
+	</div>
+	<div class="hearder">
+		<ul>
+			<li class="alarm">
+				<a class="alarm">
+		        	이벤트 : <b>0</b>개
+		        	<span></span>
+		        </a>
+		        <ul class="dts DiNone">
+		        	<li><a href="/dashboard"><span>이벤트</span> :&nbsp;&nbsp;<b>0</b>개</a></li>
+		        </ul>
+			</li>
+			<li class="clock"></li>
+			<li class="user">
+				<a href="/people" class="user">
+					<c:out value="${userVO.name}" /> 님
+				</a>
+			</li>
+			<li class="line"></li>
+			<li class="login">
+				<c:choose>
+					<c:when test="${not empty userVO.id}">
+						<a href="${pageContext.request.contextPath}/logout">로그아웃</a>
+					</c:when>
+					<c:otherwise>
+						<a href="${pageContext.request.contextPath}/login">로그인</a>
+					</c:otherwise>
+				</c:choose>
+			</li>
+		</ul>
+	</div>
+	<script type="text/javascript" src="/resources/js/custom/common/common.js"></script>		
+</header>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.enitt.poscoWebSystem.dao.MemberDAO">
+	<sql id="base_member_column">
+		member_id 							AS memberId
+		,member_pwd 					AS memberPwd
+		,member_name						AS memberName
+		,member_auth 						AS memberAuth
+		,member_email					AS memberEmail
+		,register_date 				AS registerDate
+		,update_date 					AS updateDate
+	</sql>
+	
+	<!-- 로그인 회원 상세 정보  -->
+	<select id="getLoginDetail" parameterType="MemberVO" resultType="MemberVO">
+		<![CDATA[ 
+			SELECT 
+		]]>
+		<include refid="base_member_column" />
+		<![CDATA[ 
+			FROM	member
+			WHERE BINARY(member_id) = #{memberId}
+			AND member_pwd = #{memberPwd}
+		]]>
+	</select>
+	
+</mapper>

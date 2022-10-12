@@ -1,0 +1,38 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<div class="<c:out value="${conveyorVO.conveyorState}" />">컨베이어 벨트</div>
+<ul>
+	<li>
+		<span>상&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;태 : </span>
+		<span class="<c:out value="${conveyorVO.conveyorState}" />">
+			<c:choose>
+				<c:when test="${conveyorVO.conveyorState eq 'ERROR'}">
+					OFF
+				</c:when>
+				<c:otherwise>
+					ON
+				</c:otherwise>
+			</c:choose>
+		</span>
+	</li>
+	<li>
+		<span>업&nbsp;데&nbsp;이&nbsp;트 : </span>
+		<span><c:out value="${conveyorVO.conveyorStateTime}" /></span>
+	</li>
+	<li>
+		<span>가&nbsp;동&nbsp;시&nbsp;간 : </span>
+		<span class="<c:out value="${conveyorVO.conveyorState}" />">
+			<c:choose>
+				<c:when test="${conveyorVO.conveyorState eq 'ERROR'}">
+					<c:out value="${conveyorVO.conveyorTimeDiff}" />시간 미가동
+				</c:when>
+				<c:otherwise>
+					<c:out value="${conveyorVO.conveyorTimeDiff}" />시간 정상 가동 
+				</c:otherwise>
+			</c:choose>
+		</span>
+	</li>
+</ul>
+		
+

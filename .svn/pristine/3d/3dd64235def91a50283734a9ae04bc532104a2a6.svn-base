@@ -1,0 +1,45 @@
+###################
+# servr properties
+###################
+
+# Spring 
+spring.mvc.view.prefix = /WEB-INF/views/
+spring.mvc.view.suffix = .jsp
+spring.mvc.static-path-pattern=/resources/**
+spring.mvc.dispatch-trace-request=false
+
+# Server
+server.port = 8095
+
+
+# mysqlDB
+spring.datasource.driver-class-name=net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:log4jdbc:mysql://121.138.196.193:22506/PoscoTest?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true
+#spring.datasource.url=jdbc:log4jdbc:mysql://192.168.10.225:3306/PoscoTest?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true
+spring.datasource.username=enitt
+spring.datasource.password=enitt12#
+spring.datasource.hikari.maximum-pool-size=2
+
+#mybatis
+mybatis.mapper-locations=dao/**/*.xml
+mybatis.type-aliases-package=kr.co.enitt.poscoWebSystem.vo
+mybatis.configuration.map-underscore-to-camel-case=true
+
+
+# logback
+logging.config=classpath:config/logback-spring.xml
+
+# DEVTOOLS (DevToolsProperties)
+spring.devtools.livereload.enabled=true
+
+# 파일 업로드 경로 설정
+file.upload.directory=C:/Dev/workspace-2/poscoWebSystem/src/main/webapp/
+
+# 파일 용량 설정
+spring.servlet.multipart.max-file-size=30MB
+spring.servlet.multipart.max-request-size=50MB
+
+project.main.page=/dashboard
+project.init.page.interceptor.patterns=/**
+project.init.page.interceptor.exclude.patterns=/login,/logout,/actionLogin,/mypage/passwordChange,/*/content/**,/*/excel/**,/resources/**,/error,/api/**,/*/ajax**,/attach

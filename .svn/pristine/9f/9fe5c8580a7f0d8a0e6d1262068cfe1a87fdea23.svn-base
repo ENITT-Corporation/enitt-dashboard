@@ -1,0 +1,29 @@
+$(document).ready(function(){
+	
+});
+
+function setUpdateDashEventState() {
+	var eventId = $("#dashEventStateChange [name='eventId']").val();
+	var eventStateNote = $("#eventStateNote").val();
+	var eventStateCode = $("#dashEventStateChange [name='eventStateCode']").val();
+	
+	console.log("setUpdateDashEventState : "+eventStateCode);
+
+	var params = {
+			"eventId" : eventId,
+			"eventStateCode" : eventStateCode,
+			"eventStateNote" : eventStateNote
+	};
+	
+	rAjaxCall.async("/event/ajaxInsertEventStateLog", 'POST', params, function(r) {
+		alert(r.content);
+		popClose('dashEventStateChange');
+		goSearch();
+		$("#eventStateNote").val("");
+	});
+}
+
+
+
+
+

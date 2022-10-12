@@ -1,0 +1,136 @@
+package kr.co.enitt.poscoWebSystem.service.impl;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.enitt.poscoWebSystem.dao.MemberDAO;
+import kr.co.enitt.poscoWebSystem.service.MemberService;
+import kr.co.enitt.poscoWebSystem.util.CryptoUtil;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+
+@Service("memberService")
+public class MemberServiceImpl implements MemberService{
+	
+	@Autowired
+	private MemberDAO memberDAO;
+	
+	/**
+	* @Method_Name : getLoginDetail
+	* @Method_Description : 로그인한 회원 정보
+	* ---------------------
+	* @변경이력
+	* 2022. 7. 13. / kej : 생성
+	*/
+	public MemberVO getLoginDetail(MemberVO vo) throws Exception{
+		vo.setPassword(CryptoUtil.encryptPassword(vo.getPassword(), vo.getId()));
+		MemberVO memberVO = memberDAO.getLoginDetail(vo);
+		return Optional.ofNullable(memberVO).orElse(new MemberVO());
+	}
+
+	/**
+	* @Method_Name : getMemberList
+	* @Method_Description : 회원 목록
+	* ---------------------
+	* @변경이력
+	* 2022. 7. 13. / kej : 생성
+	*/
+	@Override
+	public List<MemberVO> getMemberList(CommonVO vo) throws Exception {
+		return memberDAO.getMemberList(vo);
+	}
+	
+	/**
+	* @Method_Name : getMemberPagingList
+	* @Method_Description : 회원 목록 페이징
+	* ---------------------
+	* @변경이력
+	* 2022. 7. 13. / kej : 생성
+	*/
+	@Override
+	public List<MemberVO> getMemberPagingList(CommonVO vo) throws Exception {
+		return memberDAO.getMemberPagingList(vo);
+	}
+	
+	/**
+	* @Method_Name : getMemberListCnt
+	* @Method_Description : 회원 목록 갯수
+	* ---------------------
+	* @변경이력
+	* 2022. 7. 13. / kej : 생성
+	*/
+	@Override
+	public int getMemberListCnt(CommonVO vo) throws Exception {
+		return memberDAO.getMemberListCnt(vo);
+	}
+
+	/**
+	* @Method_Name : getMemberDetail
+	* @Method_Description : 회원 상세
+	* ---------------------
+	* @변경이력
+	* 2022. 7. 13. / kej : 생성
+	*/
+	@Override
+	public MemberVO getMemberDetail(MemberVO vo) throws Exception {
+		return memberDAO.getMemberDetail(vo);
+	}
+
+	/**
+	* @Method_Name : setMemberInsert
+	* @Method_Description : 회원 등록
+	* ---------------------
+	* @변경이력
+	* 2022. 7. 13. / kej : 생성
+	*/
+	@Override
+	public void setMemberCreate(MemberVO vo) throws Exception {
+		//비밀번호 암호화(비밀번호+아이디)
+		vo.setPassword(CryptoUtil.encryptPassword(vo.getPassword(), vo.getId()));
+		memberDAO.setMemberCreate(vo);
+		
+	}
+
+	/**
+	* @Method_Name : setMemberUpdate
+	* @Method_Description : 회원 수정
+	* ---------------------
+	* @변경이력
+	* 2022. 7. 13. / kej : 생성
+	*/
+	@Override
+	public void setMemberUpdate(MemberVO vo) throws Exception {
+		memberDAO.setMemberUpdate(vo);
+	}
+	
+	/**
+	* @Method_Name : setMemberPasswordUpdate
+	* @Method_Description : 회원 비밀번호 수정
+	* ---------------------
+	* @변경이력
+	* 2022. 7. 13. / kej : 생성
+	*/
+	@Override
+	public void setMemberPasswordUpdate(MemberVO vo) throws Exception {
+		//비밀번호 암호화(비밀번호+아이디)
+		vo.setPassword(CryptoUtil.encryptPassword(vo.getPassword(), vo.getId()));
+		memberDAO.setMemberPasswordUpdate(vo);
+	}
+
+	/**
+	* @Method_Name : setMemberDelete
+	* @Method_Description : 회원 삭제
+	* ---------------------
+	* @변경이력
+	* 2022. 7. 13. / kej : 생성
+	*/
+	@Override
+	public void setMemberDelete(MemberVO vo) throws Exception {
+		memberDAO.setMemberDelete(vo);
+		
+	}
+
+}

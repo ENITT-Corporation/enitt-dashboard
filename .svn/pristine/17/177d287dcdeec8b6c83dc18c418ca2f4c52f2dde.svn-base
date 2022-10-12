@@ -1,0 +1,15 @@
+package kr.co.enitt.poscoWebSystem.dao;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.EventStatsVO;
+
+@Mapper
+public interface EventStatsDAO {
+
+	public List<EventStatsVO> getEventStatsDayList(CommonVO vo) throws Exception;
+}

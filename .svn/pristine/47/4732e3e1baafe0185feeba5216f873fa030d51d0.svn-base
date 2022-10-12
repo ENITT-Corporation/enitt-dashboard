@@ -1,0 +1,6 @@
+package kr.co.enitt.poscoWebSystem.service;
+
+
+public interface DashboardService {
+	
+}

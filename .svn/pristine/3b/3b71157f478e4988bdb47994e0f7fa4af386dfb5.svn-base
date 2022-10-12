@@ -1,0 +1,36 @@
+package kr.co.enitt.poscoWebSystem.service;
+
+import java.util.List;
+
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+
+public interface MemberService {
+
+	//로그인한 회원 정보
+	MemberVO getLoginDetail(MemberVO vo) throws Exception;
+	
+	//회원 목록
+	List<MemberVO> getMemberList(CommonVO vo) throws Exception;
+	
+	//회원 목록 페이징
+	List<MemberVO> getMemberPagingList(CommonVO vo) throws Exception;
+	
+	//회원 목록 갯수
+	int getMemberListCnt(CommonVO vo) throws Exception;
+	
+	//회원 상세
+	MemberVO getMemberDetail(MemberVO vo) throws Exception;
+	
+	//회원 등록
+	void setMemberCreate(MemberVO vo) throws Exception;
+	
+	//회원 수정
+	void setMemberUpdate(MemberVO vo) throws Exception;
+	
+	//회원 비밀번호 수정
+	void setMemberPasswordUpdate(MemberVO vo) throws Exception;
+	
+	//회원 삭제
+	void setMemberDelete(MemberVO vo) throws Exception;
+}

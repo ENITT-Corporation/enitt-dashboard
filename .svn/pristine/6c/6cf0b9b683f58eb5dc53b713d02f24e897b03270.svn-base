@@ -1,0 +1,40 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<div class="dashboardImg">		
+	<div class="conveyor_popup">
+		<jsp:include page="./dashboard/conveyor.jsp" />
+	</div>
+	
+	<div class="equipment">
+		<jsp:include page="./dashboard/equipment_state.jsp" />
+	</div>
+	
+	<div class="das_event">
+		<ul>
+			<li class="selected"></li>
+		</ul>
+	</div>
+	
+	<div class="event_popup">
+		<div class="event_popup_row">
+			<div class="event_popup_title">
+				<p>이벤트 발생</p>
+			</div>
+			<ul>
+				<li>
+					<span>상&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;태 : </span>
+					<span class="error">발생</span>
+				</li>
+				<li>
+					<span>구&nbsp;간&nbsp;(m) : </span>
+					<span>65</span>
+				</li>
+				<li>
+					<span>발생시간 : </span>
+					<span>2020-10-30 09:30:00</span>
+				</li>
+			</ul> 
+		</div>
+	</div>
+</div>

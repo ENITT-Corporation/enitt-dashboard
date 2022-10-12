@@ -1,0 +1,58 @@
+package kr.co.enitt.poscoWebSystem.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.enitt.poscoWebSystem.dao.EventDAO;
+import kr.co.enitt.poscoWebSystem.service.EventService;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.EventStateVO;
+import kr.co.enitt.poscoWebSystem.vo.EventVO;
+
+@Service("eventService")
+public class EventServiceImpl implements EventService{
+
+	@Autowired
+	private EventDAO eventDAO;
+	
+	@Override
+	public int getEventListCnt(CommonVO vo) throws Exception {
+		return eventDAO.getEventListCnt(vo);
+	}
+
+	@Override
+	public List<CommonVO> getEventList(CommonVO vo) throws Exception {
+		return eventDAO.getEventList(vo);
+	}
+
+	@Override
+	public List<CommonVO> getEventStateDetail(EventVO vo) throws Exception {
+		return eventDAO.getEventStateDetail(vo);
+	}
+
+	@Override
+	public List<CommonVO> getEventHistoryList(CommonVO vo) throws Exception {
+		return eventDAO.getEventHistoryList(vo);
+	}
+
+	@Override
+	public EventVO getEventDetail(EventVO vo) throws Exception {
+		return eventDAO.getEventDetail(vo);
+	}
+
+	@Override
+	public void ajaxInsertEventStateLog(EventStateVO vo) throws Exception {
+		eventDAO.ajaxInsertEventStateLog(vo);
+		
+	}
+
+	@Override
+	public CommonVO getEventPopupDetail(CommonVO vo) throws Exception {
+		return eventDAO.getEventPopupDetail(vo);
+	}
+	
+
+
+}

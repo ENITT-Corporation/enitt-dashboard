@@ -1,0 +1,10 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+
+<%-- <c:forEach var="data" items="${markingList}" varStatus="status"> 
+	<div class="rollerBtn" id="<c:out value="${data.location}" />" style="bottom:<c:out value="${data.locationBottom}" />px; left:<c:out value="${data.locationLeft}" />px; right:<c:out value="${data.locationRight}" />px;"></div>
+</c:forEach>  --%>
+<div class="checkinginging"></div>
+
+

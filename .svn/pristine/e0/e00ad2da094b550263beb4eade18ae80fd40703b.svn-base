@@ -1,0 +1,161 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.service.CodeService;
+import kr.co.enitt.poscoWebSystem.service.MemberService;
+import kr.co.enitt.poscoWebSystem.util.ObjectUtil;
+import kr.co.enitt.poscoWebSystem.util.SessionScopeUtil;
+import kr.co.enitt.poscoWebSystem.util.CryptoUtil;
+import kr.co.enitt.poscoWebSystem.vo.CodeVO;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+
+/**
+* @Project : poscoWebSystem
+* @FileName : MyPageController.java
+* @Author : kej
+* @Date : 2022. 8. 2. 
+* @Description : 마이페이지
+* ===========================================================
+* DATE                   AUTHOR                     NOTE
+* -----------------------------------------------------------
+* 2022. 8. 2.       		 kej      				최초작성
+*/
+@Controller
+@RequestMapping("/mypage")
+public class MyPageController {
+	
+	@Autowired
+	private MemberService memberService;
+	
+	@Resource(name = "codeService")
+	private CodeService codeService;
+
+	
+	/**
+	* @Method_Name : getMemberPage
+	* @pram : HttpServletRequest request, CommonVO vo
+	* @retuen : ModelAndView
+	* @Date : 2022. 8. 2.
+	* @Author : kej
+	* @Method_Description : 목록
+	* ---------------------
+	* @변경이력
+	* 2022. 8. 2. / kej / 생성
+	*/ 
+	@RequestMapping(value= {"","/"})
+	public ModelAndView getMypage(HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+		
+		Object sessionLoginVo = SessionScopeUtil.getAttribute("memberVO");
+		MemberVO memberVO = (MemberVO) Optional.ofNullable(sessionLoginVo).orElse(new MemberVO());
+		MemberVO detail = memberService.getMemberDetail(memberVO);
+		mav.addObject("detail", detail);
+		
+
+		CommonVO vo = new CommonVO();
+		vo.setParentCode("MAIL");
+		List<CodeVO> mailList = codeService.getCodeList(vo);
+		mav.addObject("mailList", mailList);
+		
+		mav.addObject("commonVO", vo);
+		mav.setViewName("member/mypage");
+		return mav;
+	}
+	
+	@RequestMapping("/ajaxUpdateMember")
+	public @ResponseBody Object ajaxUpdateMember(HttpServletRequest request, MemberVO vo) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		CommonVO commonVO = new CommonVO();
+		
+		try {
+			// 회원 정보 수정
+			Object sessionLoginVo = SessionScopeUtil.getAttribute("memberVO");
+			MemberVO memberVO = (MemberVO) Optional.ofNullable(sessionLoginVo).orElse(new MemberVO());
+			vo.setId(memberVO.getId());
+			vo.setAuth(memberVO.getAuth());
+			vo.setUseYn(memberVO.getUseYn());
+			vo.setDepartment(memberVO.getDepartment());
+			vo.setUpdateId(memberVO.getId());
+			vo.setUpdateIp(request.getRemoteAddr());
+			
+			
+			memberService.setMemberUpdate(vo);
+			commonVO.setContent("정상적으로 수정되었습니다.");
+			
+		} catch (Exception e) {
+			commonVO.setContent("오류가 발생했습니다.");
+		}
+		
+		return commonVO;    
+	} 
+	
+	/**
+	  * @Method_Name : ajaxUpdatePasssword
+	  * @retuen :Object
+	  * @Date : 2020. 8. 9.
+	  * @Author : ENITT_KEJ
+	  * @Method_Description : 비밀번호 변경
+	  * ---------------------
+	  * @변경이력
+	  * 2020. 8. 9. ENITT_KEJ : 생성
+	  */
+	@RequestMapping("/ajaxUpdatePasssword")
+	public @ResponseBody Object ajaxUpdatePasssword(HttpServletRequest request, MemberVO vo) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		CommonVO commonVO = new CommonVO();
+		try {
+			
+			Object sessionLoginVo = SessionScopeUtil.getAttribute("memberVO");
+			MemberVO memberVO = (MemberVO) Optional.ofNullable(sessionLoginVo).orElse(new MemberVO());
+			vo.setId(memberVO.getId());
+			vo.setPassword(CryptoUtil.decrypt(vo.getPassword(), vo.getNow())); // 비밀번호 암호화
+			vo.setNewPassword(CryptoUtil.decrypt(vo.getNewPassword(), vo.getNow())); //새 비밀번호 암호화
+
+			
+			MemberVO detail = memberService.getLoginDetail(vo);
+
+			if(ObjectUtil.isEmpty(detail)) {
+				commonVO.setResult(false);
+				commonVO.setContent("로그인 정보가 맞지 않습니다.");
+			}else {
+				if(detail.getPassword().equals(vo.getPassword())) {
+					// 회원 정보 수정
+					vo.setPassword(vo.getNewPassword());
+					memberService.setMemberPasswordUpdate(vo);
+					commonVO.setResult(true);
+					commonVO.setContent("정상적으로 변경 되었습니다.");
+				}else {
+					commonVO.setResult(false);
+					commonVO.setContent("비밀번호가 맞지 않습니다.");
+				}
+				
+				
+				if("Y".equals(ObjectUtil.toString(vo.getPasswordChangeYn(),""))) {
+					HttpSession session = request.getSession(true);
+					session.setAttribute("loginPasswordChangeYn", "Y");
+				}
+				
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			commonVO.setContent("오류가 발생했습니다.");
+			commonVO.setResult(false);
+		}
+		
+		return commonVO; 
+	}
+}

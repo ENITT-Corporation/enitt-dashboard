@@ -1,0 +1,62 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+
+<table class="tstyle_write">
+	<colgroup>
+		<col width="25%">
+		<col width="75%">
+	</colgroup>
+	<tbody>
+		<tr>
+			<th><span>*</span>ID</th>
+			<td>
+				<input type="text" class="Wd200" name="id" maxlength="4" placeholder="ID를 입력하세요." value="" />
+			</td>
+		</tr>
+		<tr>
+			<th><span>*</span>이름</th>
+			<td>
+				<input type="text" class="Wd200" name="name" maxlength="4" placeholder="이름을 입력하세요." value="" />
+			</td>
+		</tr>
+		<tr>
+			<th><span>*</span>비밀번호</th>
+			<td>
+				<input type="text" class="Wd200" name="password" maxlength="4" placeholder="비밀번호를 입력하세요." value="" />
+			</td>
+		</tr>
+		<tr>
+			<th><span>*</span>비밀번호 확인</th>
+			<td>
+				<input type="text" class="Wd200" id="passwordCheck" maxlength="4" placeholder="비밀번호를 한번 더 입력하세요." value="" />
+			</td>
+		</tr>
+		<tr>
+			<th><span>*</span>권한</th>
+			<td>
+				<select name="auth" class="Wd200">
+				
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th><span>*</span>이메일</th>
+			<td>
+				<input type="text" class="Wd200" name="id" maxlength="4" placeholder="이메일을 입력하세요." value="" />@
+				<input type="text" class="Wd200" name="id" maxlength="4" placeholder="이메일 주소를 입력하세요." value="" />
+				<select class="Wd200">
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th><span>*</span>사용여부</th>
+			<td>
+				<input type="radio" name="useYn" id="useYnY" value="Y" />
+				<label>사용</label>
+				<input type="radio" name="useYn" id="useYnN" value="N" />
+				<label>미사용</label>
+			</td>
+		</tr>
+	</tbody>
+</table>

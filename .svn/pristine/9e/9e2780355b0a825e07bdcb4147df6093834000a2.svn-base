@@ -1,0 +1,17 @@
+package kr.co.enitt.poscoWebSystem.vo;
+
+import lombok.Data;
+
+public @Data class ConveyorVO {
+
+	private int conveyorId;
+	private String conveyorState;
+	private String conveyorStateNm;
+	private String conveyorStateTime;
+	private String conveyorUptime;
+	private String conveyorType;
+	
+	//시간차이
+	private String conveyorTimeDiff;
+	
+}

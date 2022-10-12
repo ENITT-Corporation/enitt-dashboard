@@ -1,0 +1,94 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.service.MemberService;
+import kr.co.enitt.poscoWebSystem.util.AuthenticateHelper;
+import kr.co.enitt.poscoWebSystem.util.CryptoUtil;
+import kr.co.enitt.poscoWebSystem.util.ObjectUtil;
+import kr.co.enitt.poscoWebSystem.util.SessionScopeUtil;
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+
+@Controller
+public class LoginController {
+
+	@Value("${project.main.page:/}") 
+	private String mainPage;
+	
+	@Autowired
+	private MemberService memberService;
+	
+	@RequestMapping("/login")
+	public String login(HttpServletRequest request, @ModelAttribute("memberVO") MemberVO memberVO, @ModelAttribute("message") String message) throws Exception {
+		MemberVO nowVo = (MemberVO)AuthenticateHelper.getAuthenticatedUser();
+		
+		if(nowVo != null) {
+			return "redirect:" + mainPage;
+		}else {
+			return "login";			
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/actionLogin")
+	public String actionLogin(HttpServletRequest request, @ModelAttribute("memberVO") MemberVO memberVO, ModelMap model) throws Exception {
+		
+		if (SessionScopeUtil.getAttribute("memberVO") != null) {
+			
+			// 정상 로그인 상태이므로 메인페이지로 이동
+			return "redirect:" + mainPage;
+		}
+		
+		// 현재 날짜 + 비밀번호 > 암호화 처리 된 비밀번호 저장
+		memberVO.setPassword(CryptoUtil.decrypt(memberVO.getPassword(), memberVO.getNow()));
+		
+		// 아이디와 비밀번호가 일치하는 경우, 해당 정보를 가지고 옴
+		MemberVO resultVo = memberService.getLoginDetail(memberVO);
+
+		//로그인 정보가 맞을 경우
+		if(ObjectUtil.isNotEmpty(resultVo.getId())) {
+			
+			SessionScopeUtil.setAttribute("memberVO", resultVo);
+			model.addAttribute("memberVO", memberVO);
+			return "redirect:" + mainPage;
+			
+		} else {
+			model.addAttribute("message", "로그인 정보가 올바르지 않습니다.");
+			return "login";
+		}
+	}
+	
+	@RequestMapping("/logout")
+	public String logout(HttpSession session) throws Exception {
+		
+		String memberId = kr.co.enitt.poscoWebSystem.util.SessionListener.getInstance().getMemberId(session);
+		
+		SessionScopeUtil.removeAttribute("memberVO");
+		kr.co.enitt.poscoWebSystem.util.SessionListener.getInstance().removeSession(memberId);
+		return "redirect:/login";
+	}
+	
+	@RequestMapping("/duplicatedLogin")
+	public ModelAndView duplicatedLogin() {
+		ModelAndView mav = new ModelAndView();
+		StringBuilder html = new StringBuilder();
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("/duplicatedLogin 로 진입");
+		
+		html.append("<script>confirm(\"동일한 아이디로 로그인되었습니다. 이미 접속된 사용자를 로그아웃하시겠습니까?\");</script>");
+		
+		mav.addObject("DuplicatedLoginAlert", html.toString());
+		mav.setViewName("common/login");
+		return mav;
+	}
+	
+}

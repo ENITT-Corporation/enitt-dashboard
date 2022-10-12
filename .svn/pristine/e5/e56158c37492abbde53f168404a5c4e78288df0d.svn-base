@@ -1,0 +1,35 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+
+@Controller
+@RequestMapping("/conveyor")
+public class ConveyorController {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConveyorController.class);
+	
+	/**
+	  * @Method_Name : conveyor
+	  * @return :ModelAndView
+	  * @Date : 2022. 08. 11.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 컨베이어 이력
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 08. 11. ENITT_KHR : 생성
+	  */
+	@RequestMapping(value= {"","/"})
+	public ModelAndView conveyor(HttpServletRequest request) throws Exception {
+		ModelAndView mav = new ModelAndView();
+
+		mav.setViewName("conveyor/list");    
+		return mav;
+	}	
+}

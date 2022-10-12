@@ -1,0 +1,89 @@
+package kr.co.enitt.poscoWebSystem.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.enitt.poscoWebSystem.dao.SampleDAO;
+import kr.co.enitt.poscoWebSystem.service.SampleService;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.SampleVO;
+
+@Service("sampleService")
+public class SampleServiceImpl implements SampleService{
+	@Autowired
+	private SampleDAO sampleDAO;
+	
+	/**
+	  * @Method_Name : getList , getPagingList, getrListCnt
+	  * @Method_Description : 목록
+	  * ---------------------
+	  * @변경이력
+	  * 2020. 9. 9. KEJ : 생성
+	  */
+	@Override
+	public List<SampleVO> getList(CommonVO vo) throws Exception {
+		List<SampleVO> list = sampleDAO.getList(vo);
+		return list;
+	}
+	@Override
+	public List<SampleVO> getPagingList(CommonVO vo) throws Exception {
+		List<SampleVO> list = sampleDAO.getPagingList(vo);
+		return list;
+	}
+	public int getListCnt(CommonVO vo) throws Exception {
+		int cnt = sampleDAO.getListCnt(vo);
+		return cnt;
+	}
+	
+	/**
+	  * @Method_Name : getDetail
+	  * @Method_Description : 상세 
+	  * ---------------------
+	  * @변경이력
+	  * 2020. 9. 9. KEJ : 생성
+	  */
+	@Override
+	public SampleVO getDetail(CommonVO vo) throws Exception {
+		SampleVO detail = sampleDAO.getDetail(vo);
+		return detail;
+	}
+
+	/**
+	  * @Method_Name : setCreate
+	  * @Method_Description : 등록
+	  * ---------------------
+	  * @변경이력
+	  * 2020. 9. 9. KEJ : 생성
+	  */
+	@Override
+	public void setCreate(SampleVO vo) throws Exception {
+		sampleDAO.setCreate(vo);
+	}
+	
+	/**
+	  * @Method_Name : setUpdate
+	  * @Method_Description : 수정
+	  * ---------------------
+	  * @변경이력
+	  * 2020. 9. 9. KEJ : 생성
+	  */
+	@Override
+	public void setUpdate(SampleVO vo) throws Exception {
+		sampleDAO.setUpdate(vo);
+	}
+
+	/**
+	  * @Method_Name : setDelete
+	  * @Method_Description : 삭제
+	  * ---------------------
+	  * @변경이력
+	  * 2020. 9. 9. KEJ : 생성
+	  */
+	@Override
+	public void setDelete(SampleVO vo) throws Exception {
+		sampleDAO.setDelete(vo);
+	}
+	
+}

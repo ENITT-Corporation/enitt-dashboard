@@ -1,0 +1,30 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.util.ObjectUtil;
+
+@Controller
+@RequestMapping("/trendView")
+public class TrendViewController {
+
+	@RequestMapping(value= {"","/"})
+	public ModelAndView trendView() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		// exe 파일 실행 
+//		Runtime rt = Runtime.getRuntime();
+//		String file = "C:\\Program Files\\Microsoft Office\\root\\Office16\\EXCEL.EXE";
+//		String now = ObjectUtil.getNow("",0);
+//		Process process;
+		
+		//Process process = new ProcessBuilder(file, now).start();
+//		process = rt.exec(file);
+//		process.waitFor();
+		
+		
+		return mav;
+	}
+}

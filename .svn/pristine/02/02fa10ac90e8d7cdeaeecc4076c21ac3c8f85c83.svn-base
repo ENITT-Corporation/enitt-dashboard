@@ -1,0 +1,58 @@
+package kr.co.enitt.poscoWebSystem.controller;
+//package kr.co.enitt.projectTemplate.controller;
+//
+//import java.util.HashMap;
+//import java.util.Map;
+//import java.util.Timer;
+//import java.util.TimerTask;
+//import javax.annotation.Resource;
+//import javax.websocket.server.ServerEndpoint;
+//import org.springframework.stereotype.Controller;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//
+//import kr.co.enitt.projectTemplate.service.EventService;
+//import kr.co.enitt.projectTemplate.vo.CommonVO;
+//
+//@ServerEndpoint(value="/socketEvent")
+//@Controller
+//public class SocketController {
+//	
+//	/*
+//	 * @Resource(name="eventService") private EventService eventService;
+//	 * 
+//	 * private int eventCnt;
+//	 * 
+//	 * @RequestMapping("/getSocketEvent") public Object SocketEvent() {
+//	 * Map<String,Object> result = new HashMap<String, Object>(); final CommonVO vo
+//	 * = new CommonVO();
+//	 * 
+//	 * TimerTask task = new TimerTask() {
+//	 * 
+//	 * @Override public void run() { eventCnt = eventService.getEventListCnt();
+//	 * System.out.println("@@@ TimerTask::"+eventCnt); } };
+//	 * 
+//	 * Timer timer = new Timer(true); timer.scheduleAtFixedRate(task, 0, 1000);
+//	 * System.out.println("@@@2 :: "+eventCnt);
+//	 * 
+//	 * result.put("eventCnt", eventCnt); return result; }
+//	 */
+//	
+////	@OnOpen
+////	public void onOpen(Session session) throws EncodeException {
+////		System.out.println("세션ID : "+session.getId());
+////		CommonVO vo = new CommonVO();
+////		
+////		final Basic basic = session.getBasicRemote();
+////			TimerTask task = new TimerTask() {
+////			@Override
+////			public void run() {
+////				vo.setTimerEventCnt(eventService.getEventListCnt());				
+////			}			
+////		};
+////		
+////		int eventCnt = vo.getTimerEventCnt();
+////		
+////		Timer timer = new Timer(true);
+////		timer.scheduleAtFixedRate(task, 0, 1000);
+////	}
+//}

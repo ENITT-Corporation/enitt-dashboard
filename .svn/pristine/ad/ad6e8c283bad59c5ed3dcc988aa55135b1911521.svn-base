@@ -1,0 +1,16 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+<div class="con">
+	<%-- <c:if test="${FileUtilVO.mode eq 'update'}">
+		${ fileUtil:getFileListHtml(FileUtilVO) }
+	</c:if>
+	<div>
+	${ fileUtil:attachFileHtml(FileUtilVO) }
+	</div>	
+	<!-- 상세 화면으로 보내기 위한 form (file type이 포함된 form을 전송시키면 오류 발생) -->
+	<form action="${pageContext.request.contextPath}/attach" name="f_form" id="f_form" method="post">
+		<input type="hidden" id="mode" name="mode" value="${FileUtilVO.mode}" />
+		<input type="hidden" id="fileSubId" name="fileSubId" value="<c:out value="${FileUtilVO.fileSubId}" />" />
+	</form> --%>
+</div>
+<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/custom/attach/main.js"></script>

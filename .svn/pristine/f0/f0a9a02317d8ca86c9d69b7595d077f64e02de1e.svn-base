@@ -1,0 +1,25 @@
+package kr.co.enitt.poscoWebSystem.service.impl;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.enitt.poscoWebSystem.dao.MemberDAO;
+import kr.co.enitt.poscoWebSystem.service.LoginService;
+import kr.co.enitt.poscoWebSystem.util.CryptoUtil;
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+
+@Service("loginService")
+public class LoginServiceImpl implements LoginService{
+	
+	@Autowired
+	private MemberDAO memberDAO;
+	
+	public MemberVO getLoginDetail(MemberVO vo) throws Exception{
+		vo.setMemberPwd(CryptoUtil.encryptPassword(vo.getMemberPwd(), vo.getMemberId()));
+		MemberVO memberVO = memberDAO.getLoginDetail(vo);
+		return Optional.ofNullable(memberVO).orElse(new MemberVO());
+	}
+
+}

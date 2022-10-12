@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.enitt.poscoWebSystem.dao.EventDAO">
+	<sql id="base_event_column"> 
+		E.event_id	AS eventId
+		,E.event_code	AS eventCode
+		,E.event_time	AS eventTime
+		,E.event_location	AS eventLocation
+		,E.register_date	AS registerDate
+	</sql>
+	
+	<sql id="base_event_state_column">
+		ES.event_state_id     AS eventStateId
+		,ES.event_id	      AS eventId
+		,ES.event_state_code	      AS eventStateCode
+		,ES.event_state_note   AS eventStateNote
+		,ES.register_date      AS registerDate
+		,ES.register_id	      AS registerId
+		,ES.register_ip	      AS registerIp
+	</sql>
+
+	<select id="getEventListCnt" resultType="int" parameterType="CommonVO">
+		<![CDATA[
+			SELECT count(0)
+			FROM tb_event
+		]]>
+	</select>
+	<select id="getEventListCnt2" resultType="int">
+		<![CDATA[
+			SELECT 
+							count(0)
+					FROM 		tb_event E
+					LEFT JOIN 	tb_code EC
+					ON 			(
+									EC.code_id = E.event_code
+					AND 			EC.parent_code_id = 'EVENT'
+					AND			EC.code_use_yn = 'Y'
+					)
+					WHERE		1=1
+					AND E.event_time >= DATE_SUB(#{now}, INTERVAL 12 HOUR) 
+					AND 1 =
+					       ( SELECT count(0)
+					       FROM    tb_event C
+					       WHERE  C.event_code          = E.event_code
+					       AND     C.event_location      = E.event_location
+					       AND     C.event_time >= DATE_FORMAT(DATE_SUB(E.event_time, INTERVAL 2 MINUTE), '%Y-%m-%d %H:%i:%s')
+					       AND     C.event_time <= DATE_FORMAT(E.event_time, '%Y-%m-%d %H:%i:%s')
+					       )
+		]]>
+	</select>
+	
+	<select id="getEventList" resultType="CommonVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		<![CDATA[
+			FROM tb_event E
+		]]>
+	</select>
+	
+	<select id="getEventStateDetail" parameterType="EventVO" resultType="CommonVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		,<include refid="base_event_state_column" />
+		<![CDATA[
+		, C.code_name AS eventCodeName
+		, U.name AS memberName
+			FROM tb_event_state_log ES
+			JOIN tb_code C
+			ON ES.event_state_code = C.code_id
+			JOIN tb_event E
+			ON E.event_id = ES.event_id
+			JOIN tb_user U
+			ON ES.register_id = U.id
+			WHERE 1=1
+			AND C.code_use_yn = 'Y'
+			AND ES.event_id = #{eventId}
+		]]>
+	</select>
+	
+	<select id="getEventHistoryList" resultType="CommonVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		<![CDATA[
+			,C.code_name AS eventCodeName
+			FROM tb_event E
+			JOIN tb_code C
+			ON E.event_code = C.code_id
+		]]>
+	</select>
+	
+	<select id="getEventDetail"  parameterType="EventVO"  resultType="EventVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		<![CDATA[
+			,C.code_name AS eventCodeName
+			FROM tb_event E
+			JOIN tb_code C
+			ON E.event_code = C.code_id
+			WHERE E.event_id = #{eventId} 
+		]]>
+	</select>
+	
+</mapper>

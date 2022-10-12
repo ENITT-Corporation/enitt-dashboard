@@ -1,0 +1,31 @@
+package kr.co.enitt.poscoWebSystem.vo;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@EqualsAndHashCode(of={"id"})
+public class UserVO {
+	
+	private String id;		
+	private String password;
+	private String name;	
+	private String email;	
+	private String auth;
+	private String password_change_yn;
+	private String use_yn;
+	private String login_cnt;
+	private String department;
+	private String register_date;	
+	private String register_id;	
+	private String register_ip;	
+	private String update_date;	
+	private String update_id;
+	private String update_ip;
+	
+	private String now; //현재날짜-salt
+	private boolean result;
+	
+}

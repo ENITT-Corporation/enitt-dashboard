@@ -1,0 +1,29 @@
+$(document).ready(function(){
+	
+});
+
+//이벤트 상태 변경
+function setUpdateDashEventState() {
+	var eventId = $("#statePopEventId").val();
+	var eventStateCode = $("#eventStateChange [name='eventStateCode']").val();
+	var eventStateNote = $("#eventStateNote").val();
+	dashEventState = 'Y';
+	
+	var params = {
+			"eventId" : eventId,
+			"eventStateCode" : eventStateCode,
+			"eventStateNote" : eventStateNote
+	}
+
+	rAjaxCall.async("/event/ajaxInsertEventStateLog", 'POST', params, function(r) {
+		alert(r.content);
+		dasEvent();
+		popClose('eventStateChange');
+		$("#eventStateNote").val("");
+	});
+}
+
+
+
+
+

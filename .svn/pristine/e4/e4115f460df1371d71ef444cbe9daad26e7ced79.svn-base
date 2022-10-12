@@ -1,0 +1,15 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<div class="con">
+	
+	 ${ fileUtil:getFileListHtml(FileUtilVO) } 
+	 ${ fileUtil:updateBtnHtml(FileUtilVO) }
+	 
+	<form action="${pageContext.request.contextPath}/attach" name="f_form" id="f_form">
+		<input type="hidden" name="mode" value="detail" />
+		<input type="hidden" name="fileSubId" value="<c:out value="${FileUtilVO.fileSubId}" />" />
+	</form>
+</div>
+
+<script src="${pageContext.request.contextPath}/resources/js/custom/attach/main.js"></script>

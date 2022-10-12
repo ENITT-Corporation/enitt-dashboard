@@ -1,0 +1,28 @@
+package kr.co.enitt.poscoWebSystem.vo;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class FileVO {
+
+	private Integer fileId;
+	private Integer fileSubId;
+	private String fileDataId;
+	private String filePath;
+	private String fileGroup;
+	private String fileName;
+	private String fileEtx;
+	private String fileOrgnNm;
+	private String fileFullNm;
+	private int fileSize;
+	private int fileNo; // 파일 순번
+	private int fileDownCnt = 0;
+	private String registerDate;
+	private String registerId;
+	private String registerIp;
+	
+}

@@ -1,0 +1,30 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<c:set var="alarmTopHeight" value="${83}" />
+<c:set var="heightStart" value="${750}" />
+<c:set var="height" value="${746}" />
+<c:forEach var="data" items="${dasEventList}" varStatus="status"> 
+	<c:set var="alarm_top" value="${heightStart-(height/1000*data.eventLocation)-alarmTopHeight}" />
+	<div class="event_popup" style="top:<c:out value="${alarm_top}" />px;">
+		<div class="event_popup_row">
+			<div class="event_popup_title">
+				<p>이벤트 발생</p>
+			</div>
+			<ul>
+				<li>
+					<span>상&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;태 : </span>
+					<span class="<c:out value="${data.eventStateCode}" />"><c:out value="${data.eventCodeName}" /></span>
+				</li>
+				<li>
+					<span>구&nbsp;간&nbsp;(m) : </span>
+					<span><c:out value="${data.eventLocation}" /></span>
+				</li>
+				<li>
+					<span>발생시간 : </span>
+					<span><c:out value="${data.eventTime}" /></span>
+				</li>
+			</ul> 
+		</div>
+	</div>
+</c:forEach> 

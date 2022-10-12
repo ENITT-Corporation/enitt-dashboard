@@ -1,0 +1,185 @@
+package kr.co.enitt.poscoWebSystem.vo;
+
+import java.util.Map;
+
+import lombok.Data;
+
+public @Data class CommonVO {
+		
+	private String eventLocation;
+	
+	// 메뉴
+	private String menuId;
+	
+	// 공통코드 
+	private String codeId;
+	private String codeName;
+	private String parentCode;
+	
+	//검색조건
+	private String searchType;
+	private String searchWord;
+	
+	// TrendLog
+	private int trendLogId;
+	private String trendLocation;
+	private char trendCheck;
+	private char trendMarkingCheck;
+	
+	// 이벤트 통계
+	private String eventId;	
+	private String searchTimeStart;
+	private String searchTimeEnd;
+	private String searchEventCode;	
+	
+	private String searchDay;
+	private String searchDayFirst;
+	private String searchDayLast;
+	private String searchMonth;
+	private String searchYear;
+	private String searchYearEnd;
+	
+	private String eventCodeDay;
+	private String eventTimeStart;
+	private String eventTimeEnd;
+	private String eventLocationStart;
+	private String eventLocationEnd;
+	
+	private String eventDate;
+	private String eventDateGroup;
+	private String eventCode;
+	private String eventCodeName;
+	private String eventStateCodeName;
+	private int eventCount;
+	private Integer eventCountNull;
+	
+	// 이벤트 이력
+	private int eventStateId;
+	private String eventStateCode;
+	private String eventStateNote;
+	private String eventStateRegisterDate;
+	private String registerId;
+	private String registerIp;
+	
+	private String eventTime;
+	
+	// 컨베이어 이력
+	private String state;
+	private String timeStart;
+	private String timeEnd;
+	
+
+	private int index;
+	
+	//대시보드
+	private String eventLastTime;
+	private String dashboard;
+	private String dashboard_dasEventId;
+	private String eventRollerId;
+	
+	//기타
+	private String now;
+	private String mode;
+	private String eventAlarm;
+	
+	//결과
+	private Boolean result; // -- 성공 : true, 실패 : false
+	private String content; // -- 알람창 내용
+	private Object value; // -- 결과값
+	private Map<String, Object> valueMap; // -- 결과값
+	
+	//페이징 처리
+	private String method = "goPage"; // -- 호출 메소드명
+	private String paging;
+	private String pageHtml; // -- 페이지 html
+	private int startNum; // -- limit 시작번호
+	private int pageSize = 10; // -- 페이지당 보여지는 게시글 수
+	private int firstPageNo = 1; // -- 첫번째 페이지 번호
+	private int prevPageNo; // -- 이전 페이지 번호
+	private int startPageNo; // -- 현재 페이지 기준 시작 페이지
+	private int pageNo = 1; // -- 현재 페이지
+	private int endPageNo; // -- 현재 페이지 기준 마지막 페이지
+	private int nextPageNo; // -- 다음 페이지
+	private int finalPageNo; // -- 마지막 페이지 번호
+	private int pageCount = 10; // -- 보여지는 페이지 수
+	private int totalCount= 0; // -- 총 게시글수
+	
+	private int timerEventCnt; // event count
+	
+	//회원
+	private String memberId;
+	private String memberName;
+	
+	//파일
+	private Integer fileSubId;
+	
+	//대시보드 위치
+	private int locationRight;
+	private int locationBottom;
+	
+	
+	public void setTotalCount(int totalCount) {
+		this.totalCount = totalCount;
+		makePaging();
+		pageHtml();
+	}
+	
+	private void makePaging() {
+		// -- 전체 글수가 없을 경우
+		if (totalCount == 0) {
+			return;
+		} 
+		
+		int finalPage = (totalCount + (pageSize - 1)) / pageSize;
+		if (pageNo > finalPage) {
+			this.pageNo = finalPage;
+		}
+
+		int startPage = ((pageNo - 1) / pageCount) * pageCount + 1;
+		int endPage = startPage + pageCount - 1;
+		if (endPage > finalPage) {
+			endPage = finalPage;
+		}
+
+		if (startPage == 1) {
+			this.prevPageNo = 1;
+		} else {
+			this.prevPageNo = startPage - 1;
+		}
+
+		if (endPage == finalPage) {
+			this.nextPageNo = endPage;
+		} else {
+			this.nextPageNo = endPage + 1;
+		}
+
+		this.startPageNo = startPage;
+		this.endPageNo = endPage;
+		this.finalPageNo = finalPage;
+		this.startNum = (pageNo - 1) * pageSize;
+	}
+	
+	private void pageHtml() {
+		StringBuilder html = new StringBuilder();
+
+		
+		html.append("<span class=\"inner\">");
+		html.append("<a class=\"pageFirst\" href=\"javascript:" + method + "(" + firstPageNo + ")\">" + "<img src=\"/resources/css/lib/images/btn_page_first.gif\" alt=\"첫페이지\" />" + "</a>");
+		html.append("<a class=\"pagePrev\" href=\"javascript:" + method + "(" + prevPageNo + ")\">" + "<img src=\"/resources/css/lib/images/btn_page_pre.gif\" alt=\"이전페이지\" />" + "</a>");
+		
+		for (int i = startPageNo; i <= endPageNo; i++) {
+			if (i == pageNo) {
+				html.append("<a class=\"pageNow\" href=\"#\">" + i + "</a>");
+			} else {
+				html.append("<a class=\"pageNone\" href=\"javascript:" + method + "(" + i + ")\">" + i + "</a>");
+			}
+		}
+		
+		html.append("<a class=\"pageNex\" href=\"javascript:" + method + "(" + nextPageNo + ")\">" + "<img src=\"/resources/css/lib/images/btn_page_next.gif\" alt=\"다음페이지\" />" + "</a>");
+		html.append("<a class=\"pageLast\" href=\"javascript:" + method + "(" + finalPageNo + ")\">" + "<img src=\"/resources/css/lib/images/btn_page_last.gif\" alt=\"마지막페이지\" />" + "</a>");
+		html.append("</span>");
+
+		this.pageHtml = html.toString();		
+	}
+
+}

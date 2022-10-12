@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.enitt.poscoWebSystem.dao.EventDAO">
+	<sql id="base_event_column"> 
+		E.event_id	AS eventId
+		,E.event_code	AS eventCode
+		,E.event_time	AS eventTime
+		,E.event_location	AS eventLocation
+		,E.register_date	AS eventRegisterDate
+	</sql>
+	
+	<sql id="base_event_state_column">
+		ES.event_state_id     AS eventStateId
+		,ES.event_id	      AS eventId
+		,ES.event_state_code	      AS eventStateCode
+		,ES.event_state_note   AS eventStateNote
+		,ES.register_date      AS eventStateRegisterDate
+	</sql>
+
+	<!-- 이벤트 리스트 개수 -->
+	<select id="getEventListCnt" resultType="int" parameterType="CommonVO">
+		<![CDATA[
+			SELECT count(0)
+			FROM tb_event E
+		]]>
+		<if test="dashboard != '' and dashboard != null ">
+			<![CDATA[
+				JOIN (SELECT *
+						FROM   tb_event_state_log
+						WHERE  event_state_id IN
+						       (SELECT  MAX(event_state_id)
+						       FROM     tb_event_state_log
+						       GROUP BY event_id
+						       )
+						AND NOT event_state_code IN ('STATE_03')
+						) ES
+				ON E.event_id = ES.event_id
+				JOIN tb_code C
+				ON E.event_code = C.code_id
+			]]>
+		</if>
+		<![CDATA[
+			WHERE 1 = 1
+		]]>	
+		<if test=' eventLastTime != null and eventLastTime != "" '>
+			<![CDATA[ 
+		 		AND    E.event_time >=  DATE_FORMAT(#{eventLastTime} , '%Y-%m-%d %H:%i:%s')
+			]]>
+		</if>
+	</select>
+	
+	<!-- 이벤트 통계 : 이벤트 리스트 -->
+	<select id="getEventList" parameterType="CommonVO" resultType="CommonVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		,<include refid="base_event_state_column" />
+		<![CDATA[
+			,C.code_name AS eventCodeName
+			, (
+					SELECT code_name 
+					FROM tb_code
+					WHERE code_id = ES.event_state_code
+				) AS eventStateCodeName
+			, DL.location_left AS locationLeft
+			, DL.location_right AS locationRight
+			, DL.location_bottom AS locationBottom
+			FROM tb_event E
+		]]>
+		<if test="dashboard != null and dashboard != '' ">
+			<![CDATA[
+			JOIN (SELECT *
+						FROM   tb_event_state_log
+						WHERE  event_state_id IN
+						       (SELECT  MAX(event_state_id)
+						       FROM     tb_event_state_log
+						       GROUP BY event_id
+						       )
+						AND NOT event_state_code IN ('STATE_03')
+						) ES
+				ON E.event_id = ES.event_id
+				JOIN tb_code C
+				ON E.event_code = C.code_id
+				LEFT JOIN tb_dashboard_location DL
+				ON E.event_location = DL.location
+				WHERE 1 = 1
+				AND DL.marking_yn = 'N'
+			]]>
+		</if>
+		<![CDATA[
+			ORDER BY E.event_time DESC 
+		]]>
+	</select>
+	
+	<!-- 이벤트 목록 팝업 -->
+	<select id="getEventPopupDetail"  parameterType="CommonVO"  resultType="CommonVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		,<include refid="base_event_state_column" />
+		<![CDATA[
+			,C.code_name AS eventCodeName
+			FROM tb_event E
+			JOIN tb_event_state_log ES
+			ON E.event_id = ES.event_id
+			JOIN tb_code C
+			ON ES.event_state_code = C.code_id
+		]]>
+		<if test="eventId != null and eventId != '' ">
+		<![CDATA[	
+			WHERE E.event_id = #{eventId}
+		]]>
+		</if>
+		<![CDATA[
+			ORDER BY ES.register_date DESC
+			LIMIT 1
+		]]>
+	</select>
+	
+	<!-- 이벤트 상태 상세 정보(윗) -->
+	<select id="getEventDetail"  parameterType="EventVO"  resultType="EventVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		,<include refid="base_event_state_column" />
+		<![CDATA[
+			,C.code_name AS eventCodeName
+			, (
+					SELECT code_name 
+					FROM tb_code
+					WHERE code_id = ES.event_state_code
+				) AS eventStateCodeName
+			FROM tb_event E
+			JOIN tb_event_state_log ES
+			ON E.event_id = ES.event_id
+			JOIN tb_code C
+			ON E.event_code = C.code_id
+		]]>
+		<if test="eventId != null and eventId != '' ">
+		<![CDATA[	
+			WHERE E.event_id = #{eventId}
+		]]>
+		</if>
+		<![CDATA[
+			ORDER BY ES.register_date DESC
+			LIMIT 1
+		]]>
+	</select>
+	
+	<!-- 이벤트 상태 상세 정보(아래) -->
+	<select id="getEventStateDetail" parameterType="EventVO" resultType="CommonVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		,<include refid="base_event_state_column" />
+		<![CDATA[
+		, C.code_name AS eventCodeName
+			FROM tb_event_state_log ES
+			JOIN tb_code C
+			ON ES.event_state_code = C.code_id
+			JOIN tb_event E
+			ON E.event_id = ES.event_id
+			WHERE 1=1
+			AND C.code_use_yn = 'Y'
+			AND ES.event_id = #{eventId}
+			ORDER BY ES.register_date DESC
+		]]>
+	</select>
+	
+	<!-- 이벤트 이력 : 이벤트 리스트 -->
+	<select id="getEventHistoryList" parameterType="CommonVO" resultType="CommonVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		,<include refid="base_event_state_column" />
+			<![CDATA[
+				,C.code_name AS eventCodeName
+				, (
+					SELECT code_name 
+					FROM tb_code
+					WHERE code_id = ES.event_state_code
+				) AS eventStateCodeName
+				FROM tb_event E
+				JOIN (SELECT *
+						FROM   tb_event_state_log
+						WHERE  event_state_id IN
+						       (SELECT  MAX(event_state_id)
+						       FROM     tb_event_state_log
+						       GROUP BY event_id
+						       )
+						) ES
+				ON E.event_id = ES.event_id
+				JOIN tb_code C
+				ON E.event_code = C.code_id
+				WHERE 1 = 1
+			]]>
+		<if test="eventLocationStart != null and eventLocationStart != '' and eventLocationEnd != null and eventLocationEnd != '' ">
+			<![CDATA[
+				AND E.event_location >= #{eventLocationStart}
+				AND E.event_location <= #{eventLocationEnd}
+			]]>
+		</if>
+		<if test="eventTimeStart != null and eventTimeStart != '' and eventTimeEnd != null and eventTimeEnd != '' ">
+			<![CDATA[
+				AND date_format(E.event_Time, '%Y-%m-%d') >= date_format(#{eventTimeStart}, '%Y-%m-%d')
+				AND date_format(E.event_Time, '%Y-%m-%d') <= date_format(#{eventTimeEnd}, '%Y-%m-%d')
+			]]>
+		</if>
+		<if test="eventCode != null and eventCode != '' ">
+			<![CDATA[
+				AND E.event_code = #{eventCode}
+			]]>
+		</if>
+		<if test="eventStateCode != null and eventStateCode != '' ">
+			<![CDATA[
+				AND ES.event_state_code = #{eventStateCode}
+			]]>
+		</if>
+		<if test="eventAlarm != null and eventAlarm != '' ">
+			<![CDATA[
+				AND NOT ES.event_state_code IN ('STATE_03')
+			]]>
+		</if>
+		<![CDATA[
+			ORDER BY	E.event_time DESC
+		]]>
+		<if test="paging != null and paging != '' ">
+			<![CDATA[
+				LIMIT 		${startNum}, ${pageSize}
+			]]>
+		</if>
+	</select>
+	
+	<select id="getEventHistoryListCnt" parameterType="CommonVO" resultType="int">
+		<![CDATA[
+			SELECT
+					COUNT(0)
+			FROM 	tb_event E
+			JOIN 	(
+					SELECT *
+					FROM   tb_event_state_log
+					WHERE  event_state_id IN	(
+													SELECT  	MAX(event_state_id)
+						       						FROM     tb_event_state_log
+						       						GROUP BY event_id
+						       					)
+					) ES
+			ON 		E.event_id = ES.event_id
+			JOIN 	tb_code C
+			ON 		ES.event_state_code = C.code_id
+			WHERE 	1 = 1
+		]]>
+		<if test="eventLocationStart != null and eventLocationStart != '' and eventLocationEnd != null and eventLocationEnd != '' ">
+			<![CDATA[
+				AND E.event_location >= #{eventLocationStart}
+				AND E.event_location <= #{eventLocationEnd}
+			]]>
+		</if>
+		<if test="eventTimeStart != null and eventTimeStart != '' and eventTimeEnd != null and eventTimeEnd != '' ">
+			<![CDATA[
+				AND date_format(E.event_Time, '%Y-%m-%d') >= date_format(#{eventTimeStart}, '%Y-%m-%d')
+				AND date_format(E.event_Time, '%Y-%m-%d') <= date_format(#{eventTimeEnd}, '%Y-%m-%d')
+			]]>
+		</if>
+		<if test="eventStateCode != null and eventStateCode != '' ">
+			<![CDATA[
+				AND ES.event_state_code = #{eventStateCode}
+			]]>
+		</if>
+		<if test="eventCode != null and eventCode != '' ">
+			<![CDATA[
+				AND E.event_code = #{eventCode}
+			]]>
+		</if>
+		<if test="eventAlarm != null and eventAlarm != '' ">
+			<![CDATA[
+				AND NOT ES.event_state_code IN ('STATE_03')
+			]]>
+		</if>
+	</select>
+	
+	<!-- 이벤트 상태 변경 -->
+	<insert id="ajaxInsertEventStateLog" parameterType="EventStateVO">
+		<![CDATA[
+			INSERT INTO tb_event_state_log(
+				event_id
+				, event_state_code
+				, event_state_note
+				, register_date
+			) VALUES (
+				#{eventId}
+				, #{eventStateCode}
+				, #{eventStateNote}
+				,NOW() 
+			)
+		]]>
+	</insert>
+</mapper>

@@ -1,0 +1,88 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<section class="content">
+	<div class="search_info">
+		<form action="/conveyorSearch" id="conveyorSearch" name="search_form" method="post">
+			<input type="hidden" name="pageNo" value="1"/>
+			<input type="hidden" name="pageSize" value="<c:out value="${commonVO.pageSize}" />" />
+			<input type="hidden" name="mode" value="list" />
+			
+			<label for="eventState" class="Ml0">상태</label>
+			<select name="eventState">
+				<option value="전체">전체</option>
+				<option value="발생">발생</option>
+				<option value="처리중">처리중</option>
+				<option value="처리완료">처리완료</option>
+				<c:forEach var="data" items="${eventStateSearchList}" varStatus="status">
+	            	<option value="<c:out value="${data.codeId}" />" <c:out value="${commonVO.eventState eq data.codeId ? 'selected=selected':'' }" />>
+	            		<c:out value="${data.codeName}" />
+	            	</option>
+		        </c:forEach>
+			</select>
+			<label for="eventTimeStart">시간</label>
+			<input type="text" class="Wd120" name="eventTimeStart" id="timeStart" value="<c:out value="${commonVO.eventTimeStart}" />" />
+                &nbsp;&nbsp;&nbsp; ~ &nbsp;
+              	<input type="text" class="Wd120" name="eventTimeEnd" id ="timeEnd" value="<c:out value="${commonVO.eventTimeEnd}" />" />
+              	<label for="eventLocationStart">구간</label>
+              	<input type="text" class="Wd80" name="eventLocationStart" value="<c:out value="${commonVO.eventLocationStart}" />" maxlength="4" onKeyUp="onlyNumber(this);" placeholder="전체" /> m
+              	 &nbsp;&nbsp;&nbsp; ~ &nbsp;
+              	<input type="text" class="Wd80" name="eventLocationEnd" value="<c:out value="${commonVO.eventLocationEnd}" />"  maxlength="4" onKeyUp="onlyNumber(this);" placeholder="전체" /> m
+			
+			<button type="button" class="btn_search" onclick="goSearch();">검색</button>
+		</form>
+	</div>
+	
+	<div class="content_wrap">
+		<div class="tstyle_top">
+			<p class="page_info">
+				전체 <strong><fmt:formatNumber type="number" maxFractionDigits="3" value="${commonVO.totalCount}" /></strong>건,
+				현재 페이지 <strong><fmt:formatNumber type="number" maxFractionDigits="3" value="${commonVO.pageNo}" /></strong>/<strong><fmt:formatNumber type="number" maxFractionDigits="3" value="${commonVO.finalPageNo}" /></strong>
+			</p>
+			<c:if test="${commonVO.totalCount > 0}">
+				<button class="btn_down" type="button" onclick="excelDown();">다운로드</button>
+			</c:if>
+		</div>
+		<table class="tstyle_list">
+			<colgroup>
+				<col width="20%">
+				<col width="40%">
+				<col width="40%">
+			</colgroup>
+			<thead>
+				<tr>
+					<th>NO</th>
+		          	<th>ID</th>
+		            <th>이름</th>
+		        </tr>
+			</thead>
+			<tbody>
+				<c:choose>
+	            	<c:when test="${commonVO.totalCount > 0}">
+						<c:set var="num" value ="${commonVO.totalCount - ((commonVO.pageNo - 1) * commonVO.pageSize) }"/>          			
+						<c:forEach var="data" items="${list}" varStatus="status">
+			               	<tr>
+			               		<td><c:out value="${num}"/></td>
+			                	<td><c:out value="${data.id}" /></td>
+			                  	<td><c:out value="${data.name}" /></td>
+			                </tr>
+			                <c:set var="num" value ="${num-1}"/>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<tr class="noData">
+							<td colspan="3" class="TxtC">데이터가 없습니다.</td>
+						</tr>
+					</c:otherwise>
+				</c:choose>
+			</tbody>
+		</table>
+		<div class="tstyle_bottom board_pager">
+			<c:if test="${commonVO.totalCount > 0}">
+	             	${commonVO.pageHtml}
+	         </c:if>
+		</div>
+	</div>
+</section>
+
+<script src="${pageContext.request.contextPath}/resources/js/custom/conveyor/conveyor.js"></script>

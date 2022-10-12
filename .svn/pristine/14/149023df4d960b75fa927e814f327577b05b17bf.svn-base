@@ -1,0 +1,141 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+
+
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.service.CodeService;
+import kr.co.enitt.poscoWebSystem.service.EventService;
+import kr.co.enitt.poscoWebSystem.util.ObjectUtil;
+import kr.co.enitt.poscoWebSystem.util.SessionScopeUtil;
+import kr.co.enitt.poscoWebSystem.vo.CodeVO;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.EventStateVO;
+import kr.co.enitt.poscoWebSystem.vo.EventVO;
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+
+@Controller
+@RequestMapping("/event")
+public class EventController {
+
+	private static final Logger logger = LoggerFactory.getLogger(EventController.class);
+	
+	@Resource(name = "eventService")
+	private EventService eventService;
+	
+	@Resource(name = "codeService")
+	private CodeService codeService;
+	/**
+	  * @Method_Name : event
+	  * @return :ModelAndView
+	  * @Date : 2022. 7. 20.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 이력
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 7. 20. ENITT_KHR : 생성
+	  */
+	@RequestMapping(value= {"","/"})
+	public ModelAndView event(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		// 검색 - 상태 코드
+		List<CodeVO> eventStateSearchList = codeService.getCodeList(vo);
+		mav.addObject("eventStateSearchList", eventStateSearchList);
+
+		// 목록
+		List<CommonVO> list = eventService.getEventHistoryList(vo);
+		mav.addObject("eventList", list);
+		vo.setTotalCount(list.size());
+		
+		mav.setViewName("event/list");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxEventDetail
+	  * @return :ModelAndView
+	  * @Date : 2022. 7. 20.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 이력 상세정보
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 7. 20. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/ajaxEventDetail")
+	public @ResponseBody ModelAndView ajaxEventDetail(EventVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		// 상세정보 - 윗부분
+		EventVO detail = eventService.getEventDetail(vo);
+		mav.addObject("detail", detail);
+
+		// 상세정보 - 목록
+		List<CommonVO> eventList = eventService.getEventStateDetail(vo);	
+		mav.addObject("eventList", eventList);
+		
+		mav.setViewName("event/content/detail");
+		return mav;
+		
+	}
+	
+	/**
+	  * @Method_Name : ajaxInsertEventStateLog
+	  * @return :CommonVO
+	  * @Date : 2022. 7. 21.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 상태 변경
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 7. 21. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/ajaxInsertEventStateLog")
+	public @ResponseBody CommonVO ajaxInsertEventStateLog(EventStateVO vo) throws Exception {
+		CommonVO commonVO = new CommonVO();
+		
+		// 로그인 사용자 정보 가져오기
+		Object sessionLoginVo = SessionScopeUtil.getAttribute("memberVO");
+		MemberVO memberVO = (MemberVO) Optional.ofNullable(sessionLoginVo).orElse(new MemberVO());
+		String registerId = ObjectUtil.toString(memberVO.getId(),"");
+		vo.setRegisterId(registerId);
+
+		try {
+			eventService.ajaxInsertEventStateLog(vo);
+			commonVO.setContent("이벤트 상태가 변경되었습니다.");
+			commonVO.setResult(true);
+		} catch(Exception e) {
+			e.printStackTrace();
+			commonVO.setContent("오류가 발생했습니다.");
+			commonVO.setResult(false);
+		}
+		return commonVO;
+	}
+	
+	@RequestMapping("/insertEventStateLog")
+	public ModelAndView insertEventStateLog(EventStateVO vo) {
+		ModelAndView mav = new ModelAndView();
+		
+		Object sessionLoginVo = SessionScopeUtil.getAttribute("memberVO");
+		MemberVO memberVO = (MemberVO) Optional.ofNullable(sessionLoginVo).orElse(new MemberVO());
+		String registerId = ObjectUtil.toString(memberVO.getId(),"");
+		vo.setRegisterId(registerId);
+		try {
+			eventService.ajaxInsertEventStateLog(vo);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		mav.setViewName("event/list");
+		return mav;
+	}
+	
+}

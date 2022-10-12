@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.enitt.poscoWebSystem.dao.SampleDAO">
+	<sql id="base_sample_column">
+		E.event_id          AS	eventId
+		,E.event_code       AS	eventCode
+		,E.event_time       AS	eventTime
+		,E.event_location   AS	eventLocation
+		,E.register_date    AS	registerDate
+	</sql>
+	 
+	<sql id="base_sample_code_column">
+		EC.code_name 		AS eventCodeNm
+	</sql>
+	
+	<!-- 목록  -->
+	<select id="getList" parameterType="CommonVO" resultType="SampleVO">
+		<![CDATA[ 
+			SELECT 
+		]]>
+		<include refid="base_sample_column" />,
+		<include refid="base_sample_code_column" />
+		<![CDATA[ 
+			FROM	tb_event E
+			LEFT JOIN tb_code EC
+			ON	(
+			EC.code_id = E.event_code
+			AND EC.parent_code_id = 'EVENT'
+			AND EC.code_use_yn = 'Y'
+			)
+			WHERE	1=1
+		]]>
+		<if test='searchTimeStart != null and searchTimeStart != "" '>
+			<![CDATA[ AND DATE_FORMAT(E.event_time, '%Y-%m-%d') >= DATE_FORMAT(#{searchTimeStart}, '%Y-%m-%d') ]]>
+		</if>
+		<if test='searchTimeEnd != null and searchTimeEnd != "" '>
+			<![CDATA[ AND  DATE_FORMAT(E.event_time, '%Y-%m-%d') <= DATE_FORMAT(#{searchTimeEnd}, '%Y-%m-%d')]]>
+		</if>
+		<if test='searchLocationStart != null and searchLocationStart != "" '>
+			<![CDATA[ AND E.event_location >= #{searchLocationStart} ]]>
+		</if>
+		<if test='searchLocationEnd != null and searchLocationEnd != "" '>
+			<![CDATA[ AND E.event_location <= #{searchLocationEnd} ]]>
+		</if>
+		<if test='searchEventCode != null and searchEventCode != ""  '>
+			<![CDATA[ AND E.event_code = #{searchEventCode} ]]>
+		</if>
+		<![CDATA[ 
+			ORDER BY E.register_date DESC 
+		]]>
+	</select>
+	
+	<!-- 목록(페이징)  -->
+	<select id="getPagingList" parameterType="CommonVO" resultType="SampleVO">
+		<![CDATA[ 
+			SELECT 
+		]]>
+		<include refid="base_sample_column" />,
+		<include refid="base_sample_code_column" />
+		<![CDATA[ 
+			FROM	tb_event E
+			LEFT JOIN tb_code EC
+			ON	(
+			EC.code_id = E.event_code
+			AND EC.parent_code_id = 'EVENT'
+			AND EC.code_use_yn = 'Y'
+			)
+			WHERE	1=1
+		]]>
+		<if test='searchTimeStart != null and searchTimeStart != "" '>
+			<![CDATA[ AND DATE_FORMAT(E.event_time, '%Y-%m-%d') >= DATE_FORMAT(#{searchTimeStart}, '%Y-%m-%d') ]]>
+		</if>
+		<if test='searchTimeEnd != null and searchTimeEnd != "" '>
+			<![CDATA[ AND  DATE_FORMAT(E.event_time, '%Y-%m-%d') <= DATE_FORMAT(#{searchTimeEnd}, '%Y-%m-%d')]]>
+		</if>
+		<if test='searchLocationStart != null and searchLocationStart != "" '>
+			<![CDATA[ AND E.event_location >= #{searchLocationStart} ]]>
+		</if>
+		<if test='searchLocationEnd != null and searchLocationEnd != "" '>
+			<![CDATA[ AND E.event_location <= #{searchLocationEnd} ]]>
+		</if>
+		<if test='searchEventCode != null and searchEventCode != ""  '>
+			<![CDATA[ AND E.event_code = #{searchEventCode} ]]>
+		</if>
+		<![CDATA[ 
+			ORDER BY E.register_date DESC 
+			LIMIT ${startNum}, ${pageSize}
+		]]>
+	</select>
+	
+	<!-- 목록 갯수 -->
+	<select id="getListCnt" parameterType="CommonVO" resultType="int">
+		<![CDATA[ 
+			SELECT 
+					count(0) AS cnt
+			FROM	tb_event E
+			LEFT JOIN tb_code EC
+			ON	(
+			EC.code_id = E.event_code
+			AND EC.parent_code_id = 'EVENT'
+			AND EC.code_use_yn = 'Y'
+			)
+			WHERE	1=1
+		]]>
+		<if test='searchTimeStart != null and searchTimeStart != "" '>
+			<![CDATA[ AND DATE_FORMAT(E.event_time, '%Y-%m-%d') >= DATE_FORMAT(#{searchTimeStart}, '%Y-%m-%d') ]]>
+		</if>
+		<if test='searchTimeEnd != null and searchTimeEnd != "" '>
+			<![CDATA[ AND  DATE_FORMAT(E.event_time, '%Y-%m-%d') <= DATE_FORMAT(#{searchTimeEnd}, '%Y-%m-%d')]]>
+		</if>
+		<if test='searchLocationStart != null and searchLocationStart != "" '>
+			<![CDATA[ AND E.event_location >= #{searchLocationStart} ]]>
+		</if>
+		<if test='searchLocationEnd != null and searchLocationEnd != "" '>
+			<![CDATA[ AND E.event_location <= #{searchLocationEnd} ]]>
+		</if>
+		<if test='searchEventCode != null and searchEventCode != ""  '>
+			<![CDATA[ AND E.event_code = #{searchEventCode} ]]>
+		</if>
+	</select>
+	
+	<!-- 상세  -->
+	<select id="getDetail" parameterType="CommonVO" resultType="SampleVO">
+		<![CDATA[ 
+			SELECT 
+		]]>
+		<include refid="base_sample_column" />,
+		<include refid="base_sample_code_column" />
+		<![CDATA[ 
+			FROM	tb_event E
+			LEFT JOIN tb_code EC
+			ON	(
+			EC.code_id = E.event_code
+			AND EC.parent_code_id = 'EVENT'
+			AND EC.code_use_yn = 'Y'
+			)
+			WHERE	1=1
+		]]>
+		<if test='eventId != null and eventId != ""'>
+			<![CDATA[ AND E.event_id = #{eventId} ]]>
+		</if>
+	</select>
+	
+	<!-- 등록  -->
+	<insert id="setCreate" parameterType="SampleVO">
+		<![CDATA[ 
+			INSERT INTO   
+			tb_event(
+					 event_code
+			        ,event_time
+			        ,event_location
+			        ,register_date
+			)VALUES(
+			        #{eventCode}
+			        ,#{eventTime}
+			        ,#{eventLocation}
+			        ,NOW()
+			)       
+	    ]]>
+	</insert>
+	
+	<!-- 수정  -->
+	<update id="setUpdate" parameterType="SampleVO">
+		<![CDATA[ 
+			UPDATE 	tb_event
+			SET		
+					 event_code = #{eventCode}
+			        ,event_time = #{eventTime}
+			        ,event_location = #{eventLocation}
+			WHERE 	event_id = #{eventId}
+		]]>
+	</update>
+	
+	<!-- 삭제  -->
+	<update id="setDelete" parameterType="SampleVO">
+		<![CDATA[ 
+			DELETE 	FROM tb_event
+			WHERE 	event_id = #{eventId}
+		]]>
+	</update>
+	
+</mapper>

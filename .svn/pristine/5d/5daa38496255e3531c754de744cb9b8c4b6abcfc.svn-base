@@ -1,0 +1,19 @@
+package kr.co.enitt.poscoWebSystem.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.enitt.poscoWebSystem.dao.EventDAO;
+import kr.co.enitt.poscoWebSystem.service.EventService;
+
+@Service("eventService")
+public class EventServiceImpl implements EventService{
+
+	@Autowired
+	private EventDAO eventDAO;
+	
+	@Override
+	public int getEventListCnt() {
+		return eventDAO.getEventListCnt();
+	}
+}

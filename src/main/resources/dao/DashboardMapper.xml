@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.enitt.poscoWebSystem.dao.DashboardDAO">
+	<sql id="base_event_column"> 
+		E.event_id	AS eventId
+		,E.event_code	AS eventCode
+		,E.event_time	AS eventTime
+		,E.event_location	AS eventLocation
+		,E.register_date	AS eventRegisterDate
+	</sql>
+	
+	<sql id="base_event_state_column">
+		ES.event_state_id     AS eventStateId
+		,ES.event_id	      AS eventId
+		,ES.event_state_code	      AS eventStateCode
+		,ES.event_state_note   AS eventStateNote
+		,ES.register_date      AS eventStateRegisterDate
+	</sql>
+	
+	<sql id="base_conveyor_column">
+		C.conveyor_id AS conveyorId
+		, C.conveyor_state AS conveyorState
+		, C.conveyor_state_time AS conveyorStateTime
+	</sql>
+	
+	<sql id="base_location_column">
+		DL.location_id	   AS locationId
+		, DL.location	   AS location
+		, DL.location_right   AS locationRight
+		, DL.location_bottom  AS locationBottom
+	</sql>
+	
+	<sql id="base_equipment_column">
+		ES.equipment_log_id AS equipmentLogId
+		, ES.equipment_name AS equipmentName
+		, ES.equipment_state AS equipmentState
+		, ES.equipment_note AS equipmentNote
+		, ES.equipment_state_time AS equipmentStateTime
+	</sql>
+	
+	<!-- 이벤트 목록 -->
+	<select id="getEventList" resultType="CommonVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		,<include refid="base_event_state_column" />
+			<![CDATA[
+				,C.code_name AS eventCodeName
+				FROM tb_event E
+				JOIN (SELECT *
+						FROM   tb_event_state_log
+						WHERE  event_state_id IN
+						       (SELECT  MAX(event_state_id)
+						       FROM     tb_event_state_log
+						       GROUP BY event_id
+						       )
+						AND NOT event_state_code IN ('STATE_03')
+						) ES
+				ON E.event_id = ES.event_id
+				JOIN tb_code C
+				ON ES.event_state_code = C.code_id
+				WHERE 1=1
+			]]>
+			<if test="dashboard_dasEventId != null and dashboard_dasEventId != '' ">
+				AND E.event_id = #{dashboard_dasEventId}
+			</if>
+			<![CDATA[
+				ORDER BY E.event_time DESC
+			]]>
+	</select>
+
+	<!-- 컨베이어 벨트 상태  -->
+	<select id="getConveyorState" resultType="ConveyorVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_conveyor_column" />
+		<![CDATA[
+			FROM tb_conveyor_log C
+			LEFT JOIN tb_code CD
+			ON C.conveyor_state = CD.code_id
+			WHERE CD.code_use_yn = 'Y'
+			ORDER BY C.conveyor_state_time DESC
+			LIMIT 1
+		]]>
+	</select>
+	
+	<select id="getEquipmentState" resultType="EquipmentVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_equipment_column" />
+		<![CDATA[
+			FROM tb_equipment_state_log ES
+			ORDER BY equipment_state_time DESC
+			LIMIT 1
+		]]>
+	</select>
+	
+	<!-- trendLog insert -->
+	<insert id="setTrendLogCreate" useGeneratedKeys="true" keyProperty="trendLogId" parameterType="CommonVO">
+		<![CDATA[
+			INSERT INTO tb_trend_log
+			(
+		]]>
+		<choose>
+			<when test="trendCheck == 'Y' ">
+				<![CDATA[
+					trend_check
+				]]>
+			</when>
+			<otherwise>
+				<![CDATA[
+					trend_marking_check
+				]]>
+			</otherwise>
+		</choose>
+		<![CDATA[
+				, trend_click_date
+				, trend_location
+			) VALUES (
+		]]>
+		<choose>
+			<when test="trendCheck == 'Y' ">
+				<![CDATA[
+					#{trendCheck}
+					, #{eventTime}
+					, #{eventLocation}
+				]]>
+			</when>
+			<otherwise>
+				<![CDATA[
+					 #{trendMarkingCheck}
+					, NOW()
+					, #{trendLocation}
+				]]>
+			</otherwise>
+		</choose>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	
+	<!-- 특정 롤러 ID 가져오기 -->
+	<select id="getEvent" parameterType="CommonVO" resultType="EventVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_event_column" />
+		<![CDATA[
+			FROM tb_event E
+			WHERE E.event_id = #{dashboard_dasEventId}
+		]]>
+	</select>
+	
+	<!-- 롤러 눈금 픽셀 위치 -->
+	<select id="getMarkingList" resultType="LocationVO">
+		<![CDATA[
+			SELECT
+		]]>
+		<include refid="base_location_column" />
+		<![CDATA[
+			FROM tb_dashboard_location DL
+			WHERE DL.marking_yn = 'Y'
+			ORDER BY DL.location ASC
+		]]>
+	</select>
+	
+	<!-- 이벤트 로그 개수 -->
+	<select id="getEventLogCnt" resultType="EventVO">
+		<![CDATA[
+			SELECT
+				E.event_id AS eventId 
+				, E.event_log_count AS eventLogCount
+			FROM tb_event E
+			JOIN (SELECT *
+						FROM   tb_event_state_log
+						WHERE  event_state_id IN
+						       (SELECT  MAX(event_state_id)
+						       FROM     tb_event_state_log
+						       GROUP BY event_id
+						       )
+						AND NOT event_state_code IN ('STATE_03')
+						) ES
+				ON E.event_id = ES.event_id
+			ORDER BY E.event_time DESC
+		]]>
+	</select>
+	
+	<!-- 이벤트 존재 시, 눈금 롤러 마킹 표시 -->
+	<select id="getMarkingCheckList" resultType="LocationVO">
+		<![CDATA[
+			SELECT 
+				DE.event_id AS eventId
+				,DL.location AS location
+				, DL.location_right AS locationRight
+				, DL.location_bottom AS locationButtom
+				,(CASE WHEN DE.event_location IS NULL THEN 'N' ELSE 'Y' END) AS buttonCheck
+			FROM tb_dashboard_location DL
+			LEFT JOIN (
+			SELECT
+				E.event_location , E.event_id
+			FROM tb_event E
+			JOIN (SELECT *
+						FROM   tb_event_state_log
+						WHERE  event_state_id IN
+						       (SELECT  MAX(event_state_id)
+						       FROM     tb_event_state_log
+						       GROUP BY event_id
+						       )
+						AND NOT event_state_code IN ('STATE_03')
+						) ES
+				ON E.event_id = ES.event_id
+			) AS DE 
+			ON DL.location = DE.event_location
+			WHERE DL.marking_yn = 'N'
+		]]>
+	</select>
+</mapper>

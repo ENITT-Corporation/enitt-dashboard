@@ -1,0 +1,14 @@
+package kr.co.enitt.poscoWebSystem.vo;
+
+import lombok.Data;
+
+public @Data class EventVO {
+
+	private int eventId;
+	private String eventCode;
+	private String eventTime;
+	private String eventLocation;
+	private String registerDate;
+	
+	private String eventCodeName;
+}

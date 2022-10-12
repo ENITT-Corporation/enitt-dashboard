@@ -1,0 +1,70 @@
+$(document).ready(function(){
+	// 장비 상태 1분마다 갱신
+	fncSetting();
+	//setInterval(fncSetting, 3000);
+	eventCnt();
+});
+
+function fncSetting() {
+	equipmentState();
+	conveyorState();
+	eventCnt();
+}
+
+function equipmentState() {                                                                                                                                                                                                                                                                     
+	var param = {};
+	rAjaxCall.asyncH("/dashboard/content/equipmentState", 'POST', param, function(data) {
+		$('.equipment').html("");
+		$('.equipment').html(data);
+	});
+}
+
+function conveyorState() {
+	var param = {};
+	rAjaxCall.asyncH("/dashboard/content/conveyorState", 'POST', param, function(data) {
+		$('.conveyor_popup').html("");
+		$('.conveyor_popup').html(data);
+	});
+}
+
+function eventCnt() {
+	var param = {
+		"dashboard" : "Y"
+		, "eventLastTime" : $("#eventLastTime").val()
+	};
+	
+	rAjaxCall.async("/dashboard/ajaxEventCnt", 'POST', param, function(data) {
+		console.log("eventNewCnt::"+data.eventNewCnt);
+		if(data.eventNewCnt > 0){
+			dasEvent();
+		}
+	});
+}
+
+function dasEvent() {
+	var param = {
+		"dashboard" : "Y"
+		, "eventLastTime" : $("#eventLastTime").val()
+	};
+	
+	rAjaxCall.asyncH("/dashboard/content/ajaxEvent", 'POST', param, function(data) {
+		$('.das_event').html("");
+		$('.das_event').html(data);
+		
+		param = {
+				"dashboard" : "Y"
+		};
+		rAjaxCall.asyncH("/dashboard/content/ajaxEventAlarm", 'POST', param, function(data) {
+			$('.eventListDiv').html("");
+			$('.eventListDiv').html(data);
+		});
+	});
+	
+	
+}
+
+
+
+
+
+

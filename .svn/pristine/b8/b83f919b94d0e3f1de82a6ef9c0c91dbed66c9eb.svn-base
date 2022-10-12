@@ -1,0 +1,13 @@
+package kr.co.enitt.poscoWebSystem.service;
+
+import java.util.List;
+
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.EventStatsVO;
+
+public interface EventStatsService {
+
+	List<EventStatsVO> getEventStatsDayList(CommonVO vo) throws Exception;
+	List<EventStatsVO> getEventStatsMonthList(CommonVO vo) throws Exception;
+	List<EventStatsVO> getEventStatsYearList(CommonVO vo) throws Exception;
+}

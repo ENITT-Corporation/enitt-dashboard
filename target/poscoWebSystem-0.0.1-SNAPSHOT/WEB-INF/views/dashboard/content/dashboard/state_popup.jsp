@@ -1,0 +1,59 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+    
+<div class="pop_overlay" id="dashEventStateChange">
+	<input type="hidden" name="eventId" value="<c:out value="${commonVO.eventId}" />" />
+	
+	<div class="pop_layer">
+		<div class="header">
+      		<div class="tit">이벤트 상태 변경</div>
+      		<div class="close" onclick="popClose('dashEventStateChange');"> X</div>
+   		</div>
+   		<div class="con">
+			<div class="pop_con_wrap basic_div_box" style="height:200px; width:450px;">
+				 <div class="pop_con">
+				 	<div class="table_st2">
+		        		<table>
+		        			<colgroup>
+		        				<col width="100px">
+								<col width="*"> 
+							</colgroup>
+					 		<tbody>						 			
+					        	<tr>
+					        		<th>
+					        			<span>*</span>상태
+					        		</th>
+									<td> 
+					            		<select name="eventStateCode">																					
+											<c:forEach var="data" items="${eventStateList}" varStatus="status">
+								            	<option value="<c:out value="${data.codeId}" />" <c:out value="${commonVO.eventStateCode eq data.codeId ? 'selected':'' }" />> 								        
+								            		<c:out value="${data.codeName}" />
+								            	</option>
+									        </c:forEach> 
+										</select>
+			              			</td>
+					        	</tr>
+					        	<tr>
+									<th colspan="2"> 
+					            		<span>*</span>비고
+					   				</th>
+					        	</tr>
+					        	<tr>
+					        		<td colspan="2">
+					   					<textarea name="eventStateNote" id="eventStateNote" maxlength="60" placeholder="최대 60자까지 입력 가능합니다."></textarea>
+					   				</td>
+					        	</tr>
+							</tbody>
+		        		</table>
+		      		</div>
+				 </div>
+				 <p class="BtnArea">
+					<button class="btn Mr15" type="button" onclick="popClose('dashEventStateChange');">닫기</button>
+					<button class="btn Mr5" type="button" onclick="setUpdateDashEventState();">변경</button>  
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src='<c:out value="${pageContext.request.contextPath}" />/resources/js/custom/dashboard/state_popup.js'></script>

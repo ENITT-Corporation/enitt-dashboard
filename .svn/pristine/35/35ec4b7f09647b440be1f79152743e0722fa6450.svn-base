@@ -1,0 +1,222 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.service.CodeService;
+import kr.co.enitt.poscoWebSystem.service.SampleService;
+import kr.co.enitt.poscoWebSystem.util.MD5Hash;
+import kr.co.enitt.poscoWebSystem.vo.CodeVO;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.SampleVO;
+
+/**
+ * @Project : safetyControlSystem
+ * @FileName : MemberController.java
+ * @Author : ENITT_KEJ
+ * @Date : 2020. 8. 9.
+ * @Description : 사용자 관리
+ *              =========================================================== DATE
+ *              AUTHOR NOTE
+ *              -----------------------------------------------------------
+ *              2020. 8. 9. ENITT_KEJ 최초작성
+ */
+@Controller
+@RequestMapping("/sample")
+public class SampleController {
+
+	@Resource(name = "sampleService")
+	private SampleService sampleService;
+
+	@Resource(name = "codeService")
+	private CodeService codeService;
+
+	MD5Hash MD5 = new MD5Hash();
+
+	/**
+	 * @Method_Name : list
+	 * @retuen :ModelAndView
+	 * @Date : 2020. 8. 9.
+	 * @Author : ENITT_KEJ
+	 * @Method_Description :목록 화면 ---------------------
+	 * @변경이력 2020. 8. 9. ENITT_KEJ : 생성
+	 */
+	@RequestMapping(value = { "", "/" })
+	public ModelAndView list(HttpServletRequest request, CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+
+		int cnt = sampleService.getListCnt(vo);
+		vo.setTotalCount(cnt);
+		List<SampleVO> list = sampleService.getPagingList(vo);
+		mav.addObject("list", list);
+
+		// 검색 조건
+		CommonVO commonVO = new CommonVO();
+
+		commonVO.setParentCode("EVENT");
+		List<CodeVO> eventList = codeService.getCodeList(commonVO);
+		mav.addObject("eventList", eventList);
+
+		mav.addObject("commonVO", vo);
+		mav.setViewName("sample/list");
+		return mav;
+	}
+
+	/**
+	 * @Method_Name : detail
+	 * @retuen :ModelAndView
+	 * @Date : 2020. 8. 9.
+	 * @Author : ENITT_KEJ
+	 * @Method_Description : 상세 화면 ---------------------
+	 * @변경이력 2020. 8. 9. ENITT_KEJ : 생성
+	 */
+	@RequestMapping(value = { "", "/" }, params = "mode=detail")
+	public ModelAndView detail(HttpServletRequest request, CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+
+		SampleVO detail = sampleService.getDetail(vo);
+		mav.addObject("detail", detail);
+
+		mav.addObject("commonVO", vo);
+		mav.setViewName("sample/detail");
+		return mav;
+	}
+
+	/**
+	 * @Method_Name : create
+	 * @retuen :ModelAndView
+	 * @Date : 2020. 8. 9.
+	 * @Author : ENITT_KEJ
+	 * @Method_Description : 등록 화면 ---------------------
+	 * @변경이력 2020. 8. 9. ENITT_KEJ : 생성
+	 */
+	@RequestMapping(value = { "", "/" }, params = "mode=create")
+	public ModelAndView create(HttpServletRequest request, CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+
+		// 검색 조건 S
+		CommonVO commonVO = new CommonVO();
+
+		commonVO.setParentCode("EVENT");
+		List<CodeVO> eventList = codeService.getCodeList(commonVO);
+		mav.addObject("eventList", eventList);
+		// 검색 조건 E
+
+		mav.addObject("commonVO", vo);
+		mav.setViewName("sample/form");
+		return mav;
+	}
+
+	/**
+	 * @Method_Name : update
+	 * @retuen :ModelAndView
+	 * @Date : 2020. 8. 9.
+	 * @Author : ENITT_KEJ
+	 * @Method_Description : 수정 화면 ---------------------
+	 * @변경이력 2020. 8. 9. ENITT_KEJ : 생성
+	 */
+	@RequestMapping(value = { "", "/" }, params = "mode=update")
+	public ModelAndView update(HttpServletRequest request, CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+
+		SampleVO detail = sampleService.getDetail(vo);
+		mav.addObject("detail", detail);
+
+		// 검색 조건 S
+		CommonVO commonVO = new CommonVO();
+
+		commonVO.setParentCode("EVENT");
+		List<CodeVO> eventList = codeService.getCodeList(commonVO);
+		mav.addObject("eventList", eventList);
+		// 검색 조건 E
+
+		mav.addObject("commonVO", vo);
+		mav.setViewName("sample/form");
+		return mav;
+	}
+
+	/**
+	 * @Method_Name : ajaxCreate
+	 * @retuen :Object
+	 * @Date : 2020. 8. 9.
+	 * @Author : ENITT_KEJ
+	 * @Method_Description : 등록 ---------------------
+	 * @변경이력 2020. 8. 9. ENITT_KEJ : 생성
+	 */
+	@RequestMapping("/ajaxCreate") 
+	public @ResponseBody Object ajaxCreate(HttpServletRequest request, SampleVO vo) throws Exception {
+		  request.setCharacterEncoding("UTF-8"); 
+		  CommonVO commonVO = new CommonVO();
+		  try { 
+			  sampleService.setCreate(vo); 
+			  commonVO.setResult(true);
+			  commonVO.setContent("정상적으로 등록 되었습니다.");
+		  } catch (Exception e) { 
+			  commonVO.setContent("오류가 발생했습니다.");
+			  commonVO.setResult(false); 
+		  }
+		  
+		  return commonVO;
+	}
+	
+	/**
+	 * @Method_Name : ajaxUpdate
+	 * @retuen :Object
+	 * @Date : 2020. 8. 9.
+	 * @Author : ENITT_KEJ
+	 * @Method_Description : 수정 ---------------------
+	 * @변경이력 2020. 8. 9. ENITT_KEJ : 생성
+	 */
+	@RequestMapping("/ajaxUpdate") 
+	public @ResponseBody Object ajaxUpdate(HttpServletRequest request, SampleVO vo) throws Exception {
+		  request.setCharacterEncoding("UTF-8"); 
+		  CommonVO commonVO = new CommonVO();
+		  try { 
+			  sampleService.setUpdate(vo); 
+			  commonVO.setResult(true);
+			  commonVO.setContent("정상적으로 수정 되었습니다.");
+		  } catch (Exception e) { 
+			  commonVO.setContent("오류가 발생했습니다.");
+			  commonVO.setResult(false); 
+		  }
+		  
+		  return commonVO;
+	}
+	
+	/**
+	 * @Method_Name : ajaxDelete
+	 * @retuen :Object
+	 * @Date : 2020. 8. 9.
+	 * @Author : ENITT_KEJ
+	 * @Method_Description : 삭제 ---------------------
+	 * @변경이력 2020. 8. 9. ENITT_KEJ : 생성
+	 */
+	@RequestMapping("/ajaxDelete") 
+	public @ResponseBody Object ajaxDelete(HttpServletRequest request, SampleVO vo) throws Exception {
+		  request.setCharacterEncoding("UTF-8"); 
+		  CommonVO commonVO = new CommonVO();
+		  try { 
+			  sampleService.setDelete(vo); 
+			  commonVO.setResult(true);
+			  commonVO.setContent("정상적으로 삭제 되었습니다.");
+		  } catch (Exception e) { 
+			  commonVO.setContent("오류가 발생했습니다.");
+			  commonVO.setResult(false); 
+		  }
+		  
+		  return commonVO;
+	}
+	
+	
+}

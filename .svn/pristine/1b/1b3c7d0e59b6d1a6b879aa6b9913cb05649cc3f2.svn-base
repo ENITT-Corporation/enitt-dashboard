@@ -1,0 +1,5 @@
+package kr.co.enitt.poscoWebSystem.vo;
+
+public class DashboardVO {
+	
+}

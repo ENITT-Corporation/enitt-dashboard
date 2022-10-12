@@ -1,0 +1,21 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<div class="dashboardImg">		
+	<div class="conveyor_popup">
+		<jsp:include page="./dashboard/conveyor.jsp" />
+	</div>
+	
+	<div class="equipment">
+		<jsp:include page="./dashboard/equipment_state.jsp" />
+	</div>
+	
+	<div class="das_event">
+		<jsp:include page="./dashboard/das_event.jsp" />
+	</div>
+	
+	<div class="eventListDiv">
+		<jsp:include page="./dashboard/event_popup.jsp" />
+	</div>
+</div>
+

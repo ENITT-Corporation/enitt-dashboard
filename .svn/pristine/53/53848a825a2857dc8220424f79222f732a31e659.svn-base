@@ -1,0 +1,80 @@
+package kr.co.enitt.poscoWebSystem.interceptor;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.ModelAndViewDefiningException;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import kr.co.enitt.poscoWebSystem.service.MenuService;
+import kr.co.enitt.poscoWebSystem.util.ObjectUtil;
+import kr.co.enitt.poscoWebSystem.util.SessionScopeUtil;
+import kr.co.enitt.poscoWebSystem.util.WebUtil;
+import kr.co.enitt.poscoWebSystem.vo.MenuVO;
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+
+
+@Component
+public class AuthInterceptor extends HandlerInterceptorAdapter {
+	@Autowired 
+	MenuService menuService;
+	
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		
+		Object sessionLoginVo = SessionScopeUtil.getAttribute("memberVO");
+		MemberVO memberVO = (MemberVO) Optional.ofNullable(sessionLoginVo).orElse(new MemberVO());
+		
+		String loginId = ObjectUtil.toString(memberVO.getId(),"");
+		String loginAuth = ObjectUtil.toString(memberVO.getAuth(),"");
+		
+		if(request.getRequestURI().equals("/")) {
+			ModelAndView mav = new ModelAndView("redirect:/login"); 
+			throw new ModelAndViewDefiningException(mav);
+		}
+		
+		//로그인이 안되어 있을경우
+		if(ObjectUtil.isEmpty(loginId)) {
+			ModelAndView mav = new ModelAndView("redirect:/login"); 
+			mav.addObject("message", "로그인 후 사용 가능한 메뉴 입니다.");
+			throw new ModelAndViewDefiningException(mav);
+		}
+		
+//		//비밀번호 변경 여부 확인
+//		if("N".equals(loginPasswordChangeYn)) {
+//			ModelAndView mav = new ModelAndView("redirect:/mypage/passwordChange"); 
+//			mav.addObject("message", "로그인 후 사용 가능한 메뉴 입니다.");
+//			throw new ModelAndViewDefiningException(mav);
+//		}
+		
+		String[] url = WebUtil.getUri(request).split("/"); 
+		MenuVO vo = new MenuVO();
+		
+		vo.setMenuTitle(url[1]);
+		MenuVO 	menuVO = menuService.getMenu(vo);
+		
+		if(!ObjectUtil.isEmpty(menuVO)) {
+			int menuAuth = Integer.parseInt(menuVO.getMenuAuth().replace("AUTH_", ""));
+			int auth = Integer.parseInt(loginAuth.replace("AUTH_", ""));
+			if(auth <= menuAuth) {
+				request.setAttribute("menuVO", menuVO);
+			} else {
+				ModelAndView mav = new ModelAndView("redirect:/login"); 
+				mav.addObject("message", "접근 권한이 없습니다.");
+				throw new ModelAndViewDefiningException(mav);
+			}
+		}else {//해당 url의 메뉴가 없을 경우
+			ModelAndView mav = new ModelAndView("redirect:/login"); 
+			mav.addObject("message", "해당하는 메뉴가 없습니다.");
+			throw new ModelAndViewDefiningException(mav);
+		}
+
+		return true;
+	}
+	
+}

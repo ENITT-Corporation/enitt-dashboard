@@ -1,0 +1,25 @@
+$(document).ready(function(){
+	$("#timeStart").datepicker(); 
+	$("#timeEnd").datepicker(); 	
+	
+	// 이벤트 이력 화면 처음 로딩 시, 가장 최근 이벤트 이력 id를 보냄 
+	var id = $(".tstyle_list tbody tr").eq(0).attr("id");
+	getEventDetail(id);
+	
+	$(".tstyle_list tbody tr").click(function(){ 	
+		var id = $(this).attr("id");
+		getEventDetail(id);
+	});
+	
+});
+
+function getEventDetail(eventId){
+	var params = {
+			"eventId" : eventId
+	}
+	rAjaxCall.asyncH("/event/content/ajaxEventDetail", 'POST', params, function(r) {
+		$("#event_detail").html(r);
+	});
+}
+	
+	

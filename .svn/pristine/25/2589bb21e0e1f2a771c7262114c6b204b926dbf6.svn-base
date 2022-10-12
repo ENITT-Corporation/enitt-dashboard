@@ -1,0 +1,12 @@
+$(document).ready(function(){
+	var mode = $("[name=mode]").val();
+	if(mode == "list"){
+		$("#timeStart").datepicker(); 
+		$("#timeEnd").datepicker(); 
+		
+	}else if(mode == "detail"){
+	}
+
+});
+
+

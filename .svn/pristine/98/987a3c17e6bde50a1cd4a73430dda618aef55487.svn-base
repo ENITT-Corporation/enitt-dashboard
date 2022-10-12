@@ -1,0 +1,60 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+<div class="header">
+	<div class="home">
+		<a href="/dashboard">
+			B.C. 무인점검 시스템
+		</a>
+	</div>
+	<div class="menu">
+		<nav class="gnb">
+			<ul>
+		    	<li class="<c:out value="${menuVO.menuTitle eq 'dashboard' ? 'selected' : ''}" />" onclick="location.href='/dashboard' ">
+					<span class="dashboard">대시보드</span> 
+				</li>
+				<li class="<c:out value="${menuVO.menuTitle eq 'event' ? 'selected' : ''}" />" onclick="location.href='/event' ">
+					<span class="event">이벤트 이력</span> 
+				</li>
+				<li class="<c:out value="${menuVO.menuTitle eq 'conveyor' ? 'selected' : ''}" />" onclick="location.href='/conveyor' ">
+					<span class="conveyor">컨베이어 이력</span> 
+				</li>
+				<li class="<c:out value="${menuVO.menuTitle eq 'eventStats' ? 'selected' : ''}" />" onclick="location.href='/eventStats' ">
+					<span class="eventStats">이벤트 통계</span> 
+				</li>
+				<%-- <li class="<c:out value="${menuVO.menuTitle eq 'trendView' ? 'selected' : ''}" />" onclick="ajaxMainClickTrendView();">
+					<span class="trendView">트렌드 뷰</span> 
+				</li>  --%>
+			</ul>
+		</nav>
+	</div>
+	<ul class="eventAlarm alarm">
+		<li>
+			<a class="alarm" href="/event?eventAlarm=Y">
+	        	이벤트 : <b></b>개
+	        </a>
+	        <ul class="DiNone">
+	        	<li><a href="/dashboard"><span>이벤트</span> :&nbsp;&nbsp;<b>0</b>개</a></li>
+	        </ul>
+		</li>
+	</ul>
+	<div class="menu_bottom">
+		<nav class="gnb">
+			<ul>
+		    	<li class="<c:out value="${menuVO.menuTitle eq 'dashboard' ? 'selected' : ''}" />" onclick="location.href='/dashboard' ">
+					<span class="dashboard">대시보드</span> 
+				</li>
+				<li class="<c:out value="${menuVO.menuTitle eq 'event' ? 'selected' : ''}" />" onclick="location.href='/event' ">
+					<span class="event">이벤트 이력</span> 
+				</li>
+				<li class="<c:out value="${menuVO.menuTitle eq 'conveyor' ? 'selected' : ''}" />" onclick="location.href='/conveyor' ">
+					<span class="conveyor">컨베이어 이력</span> 
+				</li>
+				<li class="<c:out value="${menuVO.menuTitle eq 'eventStats' ? 'selected' : ''}" />" onclick="location.href='/eventStats' ">
+					<span class="eventStats">이벤트 통계</span> 
+				</li>
+			</ul>
+		</nav>
+	</div>
+</div>
+
+<script type="text/javascript" src="/resources/js/custom/common/common.js"></script>		

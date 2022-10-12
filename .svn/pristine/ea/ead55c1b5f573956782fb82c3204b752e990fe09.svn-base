@@ -1,0 +1,207 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.service.DashboardService;
+import kr.co.enitt.poscoWebSystem.service.EventService;
+import kr.co.enitt.poscoWebSystem.util.ObjectUtil;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.ConveyorVO;
+import kr.co.enitt.poscoWebSystem.vo.EquipmentVO;
+import kr.co.enitt.poscoWebSystem.vo.EventVO;
+
+
+/**
+* @Project : poscoWebSystem
+* @FileName : DashboardController.java
+* @Author : ENITT_KHR
+* @Date : 2022. 07. 05. 
+* @Description : 대시보드
+* ===========================================================
+* DATE                   AUTHOR                     NOTE
+* -----------------------------------------------------------
+* 2022. 07. 05.        ENITT      최초작성
+*/
+@Controller 
+@RequestMapping("/dashboard")
+public class DashboardController {
+
+	private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
+	
+	@Resource(name = "dashboardService")
+	private DashboardService dashboardService;
+	
+	@Resource(name = "eventService")
+	private EventService eventService;
+		
+	/**
+	  * @Method_Name : main
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 05.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 대시보드 화면 호출
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 05. ENITT_KHR : 생성
+	  */
+	@RequestMapping(value= {"","/"})
+	public ModelAndView main(HttpServletRequest request, CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+		
+		// 이벤트 목록
+	    List<CommonVO> list = dashboardService.getEventList();
+	    vo.setTotalCount(list.size()); 
+	    mav.addObject("eventList", list);
+		
+		mav.addObject("commonVO", vo);
+		mav.setViewName("dashboard/main");    
+		return mav;
+	}	
+	
+	/**
+	  * @Method_Name : ajaxEventCnt
+	  * @return :Object
+	  * @Date : 2022. 07. 28.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 알림 갯수
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 28. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/ajaxEventCnt")
+	public @ResponseBody Object ajaxEventCnt(CommonVO vo) throws Exception {
+		HashMap<String,Object> result = new HashMap<String,Object>();
+		
+		vo.setNow(ObjectUtil.getNow("",0)); // 현재 시간
+		String timeStr = ObjectUtil.getNow("SECOND", -4);		
+		vo.setEventLastTime(timeStr);
+		
+		int eventNewCnt = eventService.getEventListCnt(vo);
+		result.put("eventNewCnt", eventNewCnt);
+		
+		return result;
+	}
+	
+	/**
+	  * @Method_Name : ajaxEvent
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 28.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 알림 아이콘 출력
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 28. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/ajaxEvent")
+	public @ResponseBody ModelAndView ajaxEvent(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		vo.setNow(ObjectUtil.getNow("",0));
+		List<CommonVO> dasEventList = eventService.getEventList(vo);
+		mav.addObject("dasEventList", dasEventList);
+	
+		if(ObjectUtil.isNotEmpty(dasEventList)) {
+			vo.setEventLastTime(dasEventList.get(0).getEventTime());
+		}
+
+		mav.addObject("commonVO", vo);
+		mav.setViewName("dashboard/content/dashboard/das_event");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxEventAlarm
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 28.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 알림창 출력
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 28. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/ajaxEventAlarm")
+	public @ResponseBody ModelAndView ajaxEventAlarm(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		vo.setNow(ObjectUtil.getNow("",0)); 
+		List<CommonVO> dasEventList = eventService.getEventList(vo);
+		mav.addObject("dasEventList", dasEventList);
+		for(int i=0 ; i<dasEventList.size() ; i++) {
+			System.out.println(i+"번째:"+dasEventList.get(i));
+		}
+		
+		mav.setViewName("dashboard/content/dashboard/event_popup");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxEquipmenState
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 27.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : DAS 장비 상태 확인
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 27. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/equipmentState")
+	public @ResponseBody ModelAndView ajaxEquipmenState(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		// DAS 장비 상태
+		EquipmentVO equipVO = dashboardService.getEquipmentState();
+		mav.addObject("equipmentVO", equipVO);
+		
+		mav.setViewName("dashboard/content/dashboard/equipment_state");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxConveyorState
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 27.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 컨베이어 벨트 상태 확인
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 27. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/conveyorState")
+	public @ResponseBody ModelAndView ajaxConveyorState(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();		
+		LocalDateTime now = LocalDateTime.now();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");			
+		
+		// 컨베이어 벨트 상태
+		ConveyorVO conveyorVO = dashboardService.getConveyorState();
+		
+		// 가동시간 계산
+		String formatNow = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		long curDateTime = dateFormat.parse(formatNow).getTime();
+		Date conveyorTime = dateFormat.parse(conveyorVO.getConveyorStateTime());
+		long conDateTime = conveyorTime.getTime();
+		long hour = (curDateTime - conDateTime) / 3600000;
+		conveyorVO.setConveyorTimeDiff(hour);
+		
+		mav.addObject("conveyorVO", conveyorVO);	
+		mav.setViewName("dashboard/content/dashboard/conveyor");
+		return mav;
+	}
+}

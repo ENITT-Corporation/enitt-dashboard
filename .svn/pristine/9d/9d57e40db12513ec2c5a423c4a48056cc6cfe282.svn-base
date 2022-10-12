@@ -1,0 +1,121 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<section class="content">
+	<div class="search_info">
+		<form action="/event" id="eventSearch" name="search_form" method="post">
+			<input type="hidden" name="pageNo" value="1"/>
+			<input type="hidden" name="pageSize" value="<c:out value="${commonVO.pageSize}" />" />
+			<input type="hidden" name="index" value="<c:out value="${commonVO.index}" />" />
+			<input type="hidden" name="mode" value="list" />
+		
+			<label for="eventStateCode" class="Ml0">상태</label>
+			<select name="eventStateCode">
+				<option value="">전체</option>
+				<c:forEach var="data" items="${eventStateSearchList}" varStatus="status">
+	            	<option value="<c:out value="${data.codeId}" />" <c:out value="${commonVO.eventStateCode eq data.codeId ? 'selected=selected':'' }" />>
+	            		<c:out value="${data.codeName}" />
+	            	</option>
+		        </c:forEach>
+			</select>
+			<label for="eventTimeStart">시간</label>
+			<input type="text" class="Wd120" name="eventTimeStart" id="timeStart" value="<c:out value="${commonVO.eventTimeStart}" />" />
+                &nbsp;&nbsp;&nbsp; ~ &nbsp;
+              	<input type="text" class="Wd120" name="eventTimeEnd" id ="timeEnd" value="<c:out value="${commonVO.eventTimeEnd}" />" />
+              	<label for="eventLocationStart">구간</label>
+              	<input type="text" class="Wd80" name="eventLocationStart" value="<c:out value="${commonVO.eventLocationStart}" />" maxlength="4" onKeyUp="onlyNumber(this);" placeholder="전체" /> m
+              	 &nbsp;&nbsp;&nbsp; ~ &nbsp;
+              	<input type="text" class="Wd80" name="eventLocationEnd" value="<c:out value="${commonVO.eventLocationEnd}" />"  maxlength="4" onKeyUp="onlyNumber(this);" placeholder="전체" /> m
+			
+			<button type="button" class="btn_search" onclick="goSearch();">검색</button>
+		</form>
+	</div>
+	
+	<div class="content_wrap">
+		<div class="left_box">
+			<div class="box_title">
+				<p>목록</p>
+			</div>
+			<div class="box_content">
+				<div class="tstyle_top">
+					<p class="page_info">
+						전체 <strong><fmt:formatNumber type="number" maxFractionDigits="3" value="${commonVO.totalCount}" /></strong>건,
+						현재 페이지 <strong><fmt:formatNumber type="number" maxFractionDigits="3" value="${commonVO.pageNo}" /></strong>/<strong><fmt:formatNumber type="number" maxFractionDigits="3" value="${commonVO.finalPageNo}" /></strong>
+					</p>
+					<c:if test="${commonVO.totalCount > 0}">
+						<button class="btn_down" type="button" onclick="excelDown();">다운로드</button>
+					</c:if>
+				</div>
+				<table class="tstyle_list">
+					<colgroup>
+						<col width="10%">
+						<col width="40%">
+						<col width="25%">
+						<col width="30%">
+					</colgroup>
+					<thead>
+						<tr>
+							<th>NO</th>
+				          	<th>초기 발생시간</th>
+				            <th>구간(m)</th>
+				            <th>상태</th>
+				        </tr>
+					</thead>
+					<tbody>
+						<c:choose>
+			            	<c:when test="${commonVO.totalCount > 0}">
+								<c:set var="num" value ="${commonVO.totalCount - ((commonVO.pageNo - 1) * commonVO.pageSize) }"/>          			
+								<c:forEach var="data" items="${eventList}" varStatus="status">
+					               	<tr class="noData" id="<c:out value="${data.eventId}" />">					               		
+					               		<td><c:out value="${num}"/></td>
+					                	<td><c:out value="${data.eventTime}" /></td>
+					                  	<td><c:out value="${data.eventLocation}" /></td>
+					                  	<td>
+					                  		<c:choose>
+					                  			<c:when test="${data.eventStateCode eq 'STATE_01'}">
+					                  				<p class="error"><c:out value="${data.eventCodeName}" /></p>
+					                  			</c:when>
+					                  			<c:when test="${data.eventStateCode eq 'STATE_02'}">
+					                  				<p class="processing"><c:out value="${data.eventCodeName}" /></p>
+					                  			</c:when>
+					                  			<c:otherwise>
+					                  				<p class="Pt10"><c:out value="${data.eventCodeName}" /></p>
+					                  			</c:otherwise>
+					                  		</c:choose>
+					                  	</td>
+					                </tr>
+					                <c:set var="num" value ="${num-1}"/>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<tr class="noData">
+									<td colspan="5" class="TxtC">데이터가 없습니다.</td>
+								</tr>
+							</c:otherwise>
+						</c:choose>
+					</tbody>
+				</table>
+				<div class="tstyle_bottom board_pager">
+					<c:if test="${commonVO.totalCount > 0}">
+		             	${commonVO.pageHtml}
+		         	</c:if>
+				</div>
+			</div>
+		</div>
+		<div class="right_box">
+			<div class="box_title">
+				<p>상세정보</p>
+			</div>
+			<div class="box_content" id="event_detail">
+				<jsp:include page="./content/detail.jsp" />
+			</div>
+		</div>
+	</div>
+	
+	<div class="popup_content">
+		<jsp:include page="./content/popup.jsp" />
+	</div>
+	
+</section>
+
+<script src="${pageContext.request.contextPath}/resources/js/custom/event/event.js"></script>

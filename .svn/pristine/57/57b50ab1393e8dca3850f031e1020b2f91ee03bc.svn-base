@@ -1,0 +1,173 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.service.CodeService;
+import kr.co.enitt.poscoWebSystem.service.EventService;
+import kr.co.enitt.poscoWebSystem.util.DownloadUtil;
+import kr.co.enitt.poscoWebSystem.util.ObjectUtil;
+import kr.co.enitt.poscoWebSystem.util.SessionScopeUtil;
+import kr.co.enitt.poscoWebSystem.vo.CodeVO;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.EventStateVO;
+import kr.co.enitt.poscoWebSystem.vo.EventVO;
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+
+@Controller
+@RequestMapping("/event")
+public class EventController {
+
+	@Resource(name = "eventService")
+	private EventService eventService;
+	
+	@Resource(name = "codeService")
+	private CodeService codeService;
+	
+	private String eventAlarm;
+	/**
+	  * @Method_Name : event
+	  * @return :ModelAndView
+	  * @Date : 2022. 7. 20.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 이력
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 7. 20. ENITT_KHR : 생성
+	  */
+	@RequestMapping(value= {"","/"})
+	public ModelAndView event(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		String now = ObjectUtil.getNow("",0).substring(0,10);
+		
+		//24시간 내의 발생한 이벤트만 보여주던가, 아니면 시간 제한 제외하고 처리 완료되지 않은 이벤트만 보여주던가 => 질문드리고 확답 받고 수정하기.
+		// 메뉴 - 이벤트 알림 이동 
+		if(ObjectUtil.isNotEmpty(vo.getEventAlarm())) {
+//			vo.setEventTimeStart(now);
+//			vo.setEventTimeEnd(now);
+			eventAlarm = vo.getEventAlarm();
+		} 		
+		
+		// 검색 - 상태 코드 & 상태 변경 팝업
+		vo.setParentCode("STATE");
+		List<CodeVO> eventStateSearchList = codeService.getCodeList(vo);
+		mav.addObject("eventStateSearchList", eventStateSearchList);
+		
+		// 검색 - 종류 코드 
+		vo.setParentCode("EVENT");
+		List<CodeVO> eventCodeSearchList = codeService.getCodeList(vo);
+		mav.addObject("eventCodeSearchList", eventCodeSearchList);
+
+		// 목록
+		int cnt = eventService.getEventHistoryListCnt(vo);
+		vo.setTotalCount(cnt);
+		vo.setPaging("Y");
+		List<CommonVO> list = eventService.getEventHistoryList(vo);
+		mav.addObject("eventList", list);
+
+		mav.addObject("commonVO", vo);
+		mav.setViewName("event/list");
+		return mav;
+	}
+	
+	/**
+	* @Method_Name : excelList
+	* @pram :
+	* @retuen : void
+	* @Date : 2022. 8. 11.
+	* @Author : kej
+	* @Method_Description : 
+	* ---------------------
+	* @변경이력
+	* 2022. 8. 11. / kej / 생성
+	*/ 
+	@RequestMapping("/excel/list")  
+	public void excelList(HttpServletRequest request, HttpServletResponse response, CommonVO vo) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		 
+		vo.setNow(ObjectUtil.getNow("",0)); // 현재 시간
+		vo.setEventAlarm(eventAlarm);
+		
+		List<CommonVO> list = eventService.getEventHistoryList(vo);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("sheetName","이벤트 이력");
+		map.put("fileName","이벤트 이력");
+		map.put("title","초기 발생시간,구간(m),상태");
+		map.put("cell","eventTime,eventLocation,eventCodeName");
+		
+		DownloadUtil.ecxelDown(request, response, map, list,"Y");
+	} 
+	
+	
+	/**
+	  * @Method_Name : ajaxEventDetail
+	  * @return :ModelAndView
+	  * @Date : 2022. 7. 20.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 이력 상세정보
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 7. 20. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/ajaxEventDetail")
+	public @ResponseBody ModelAndView ajaxEventDetail(EventVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		// 상세정보 - 윗부분
+		EventVO detail = eventService.getEventDetail(vo);
+		mav.addObject("detail", detail);
+
+		// 상세정보 - 목록
+		List<CommonVO> eventList = eventService.getEventStateDetail(vo);	
+		mav.addObject("eventList", eventList);
+		
+		mav.setViewName("event/content/detail");
+		return mav;
+		
+	}
+	
+	/**
+	  * @Method_Name : ajaxInsertEventStateLog
+	  * @return :CommonVO
+	  * @Date : 2022. 7. 21.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 상태 변경
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 7. 21. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/ajaxInsertEventStateLog")
+	public @ResponseBody CommonVO ajaxInsertEventStateLog(EventStateVO vo) throws Exception {
+		CommonVO commonVO = new CommonVO();
+		
+		// 로그인 사용자 정보 가져오기
+		Object sessionLoginVo = SessionScopeUtil.getAttribute("memberVO");
+		MemberVO memberVO = (MemberVO) Optional.ofNullable(sessionLoginVo).orElse(new MemberVO());
+		String registerId = ObjectUtil.toString(memberVO.getId(),"");
+		vo.setRegisterId(registerId);
+
+		try {
+			eventService.ajaxInsertEventStateLog(vo);
+			commonVO.setContent("이벤트 상태가 변경되었습니다.");
+			commonVO.setResult(true);
+		} catch(Exception e) {
+			e.printStackTrace();
+			commonVO.setContent("오류가 발생했습니다.");
+			commonVO.setResult(false);
+		}
+		return commonVO;
+	}
+	
+	
+}

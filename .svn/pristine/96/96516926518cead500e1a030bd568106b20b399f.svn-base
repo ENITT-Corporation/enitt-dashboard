@@ -1,0 +1,14 @@
+package kr.co.enitt.poscoWebSystem.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.enitt.poscoWebSystem.dao.DashboardDAO;
+import kr.co.enitt.poscoWebSystem.service.DashboardService;
+
+@Service("DashboardService")
+public class DashboardServiceImpl implements DashboardService{
+	@Autowired
+	private DashboardDAO dashboardDAO;
+	
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.enitt.poscoWebSystem.dao.EventDAO">
+<select id="getEventListCnt" resultType="int">
+	<![CDATA[
+		SELECT 
+						count(0)
+				FROM 		tb_event E
+				LEFT JOIN 	tb_code EC
+				ON 			(
+								EC.code_id = E.event_code
+				AND 			EC.parent_code_id = 'EVENT'
+				AND			EC.code_use_yn = 'Y'
+				)
+				WHERE		1=1
+				AND E.event_time >= DATE_SUB(#{now}, INTERVAL 12 HOUR) 
+				AND 1 =
+				       ( SELECT count(0)
+				       FROM    tb_event C
+				       WHERE  C.event_code          = E.event_code
+				       AND     C.event_location      = E.event_location
+				       AND     C.event_time >= DATE_FORMAT(DATE_SUB(E.event_time, INTERVAL 2 MINUTE), '%Y-%m-%d %H:%i:%s')
+				       AND     C.event_time <= DATE_FORMAT(E.event_time, '%Y-%m-%d %H:%i:%s')
+				       )
+	]]>
+</select>
+</mapper>

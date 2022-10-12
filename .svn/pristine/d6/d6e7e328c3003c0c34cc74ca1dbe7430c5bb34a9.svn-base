@@ -1,0 +1,73 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<div class="board_info">
+	<form action="/eventStats" name="month_form" id="month_form" method="post">
+		<input type="hidden" name="mode" value="month" />
+		<input type="hidden" name="searchDay" value="${commonVO.searchDay}" />
+		<input type="hidden" name="searchYear" value="${commonVO.searchYear}" />
+		<input type="hidden" name="searchYearEnd" value="${commonVO.searchYearEnd}" />
+		
+		<div class="search_stats_info">
+			<label class="Wd50 ClearWS" for="searchMonth">날짜</label>
+			 <input type="text" class="Wd80 yearPicker" name="searchMonth" id="searchMonth" value="<c:out value="${commonVO.searchMonth}" />">
+			<button type="submit"  class="btn_search" >검색</button>
+		</div>
+	</form>
+</div>
+
+<div id="dayContainer" class="chartDiv"></div>
+<c:if test="${dayData.data.size() > 0}">
+	<button class="btn_down" type="button" onclick="excelDown('month');">다운로드</button>
+</c:if>
+<div class="statsTable">
+	<table class="tstyle_list3">
+		<caption>이벤트 통계 월별 목록입니다.</caption>
+		<colgroup>
+	       	<col width="10%">
+			<col width="*">
+		</colgroup>
+		<thead>
+			<tr>
+				<th>NO</th>
+          		<th>날짜</th>
+          		<th>이벤트 개수</th>
+          		<th>분포도</th> 	 	
+	        </tr>
+		</thead>
+		<tbody>
+			<c:choose>
+	            <c:when test="${resultList.monthList.size() > 0}">
+	            	<c:set var="num" value="1"/>
+	            	<c:forEach var="data" items="${resultList.monthList}" varStatus="status">
+				        <tr class="noData">
+				        	<td><c:out value="${num}" /></td>
+				            <td>
+				            	<c:out value="${data.eventDateGroup}월" />
+				            </td>
+				            <td>
+				            	<c:out value="${data.eventCount}" />
+				            </td>
+			          		<td>
+			            		<c:choose>
+				            		<c:when test="${data.eventCount != 0}">
+				            			<span class="on" onClick="scatterPlot('<c:out value="${resultList.eventDayDates[status.index]}" />')">상세보기</span>
+				            		</c:when>
+				            		<c:otherwise>
+				            			<span>상세보기</span>
+				            		</c:otherwise>
+				            	</c:choose>	
+			            	</td>
+				        </tr>
+				        <c:set var="num" value ="${num+1}"/>
+					</c:forEach>
+	        	</c:when>
+	        	<c:otherwise>
+	       			<tr class="noData">
+						<td colspan='4' class="TxtC">데이터가 없습니다.</td>
+					</tr>
+	        		</c:otherwise>
+	        </c:choose>
+		</tbody>
+	</table>
+</div>

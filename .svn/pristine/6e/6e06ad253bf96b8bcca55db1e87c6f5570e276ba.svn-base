@@ -1,0 +1,16 @@
+package kr.co.enitt.poscoWebSystem.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.EventVO;
+
+@Mapper
+public interface EventDAO {
+
+	public int getEventListCnt();
+
+	public List<EventVO> getEventList(CommonVO vo);
+}

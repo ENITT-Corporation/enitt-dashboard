@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.enitt.poscoWebSystem.dao.MemberDAO">
+	<sql id="base_member_column">
+		M.id					AS	id
+		,M.password				AS	password
+		,M.name					AS	name
+		,M.email				AS	email
+		,M.auth					AS	auth
+		,M.password_change_yn	AS	passwordChangeYn
+		,M.use_yn				AS	useYn
+		,M.login_cnt			AS	loginCnt
+		,M.department			AS	department
+		,M.register_date		AS	registerDate
+		,M.register_id			AS	registerId
+		,M.register_ip			AS	registerIp
+		,M.update_date			AS	updateDate
+		,M.update_id			AS	updateId
+		,M.update_ip			AS	updateIp
+	</sql>
+	<sql id="base_auth_code_column">
+		C.code_name				AS	authName
+	</sql>
+	
+	<!-- 목록(페이징)  -->
+	<select id="getMemberList" parameterType="CommonVO" resultType="MemberVO">
+		<![CDATA[ 
+			SELECT 
+		]]>
+		<include refid="base_member_column" />,
+		<include refid="base_auth_code_column" />
+		<![CDATA[ 
+			FROM	tb_user	M
+			LEFT JOIN tb_code C
+			ON	(
+			C.code_id = M.auth
+			AND C.parent_code_id = 'AUTH'
+			AND C.code_use_yn = 'Y'
+			)
+			WHERE	1=1
+		]]>
+		<choose>
+			<when test=" searchType == 'ID' ">
+				<![CDATA[ AND	M.id LIKE CONCAT('%',#{searchWord},'%') ]]>
+			</when>
+			<when test=" searchType == 'NAME' ">
+				<![CDATA[ AND	M.name LIKE CONCAT('%',#{searchWord},'%') ]]>
+			</when>
+			<otherwise>
+				<if test='searchWord != null and searchWord != "" '>
+					<![CDATA[ AND (
+									M.id LIKE CONCAT('%',#{searchWord},'%')
+									OR
+									M.name LIKE CONCAT('%',#{searchWord},'%') 
+									) 
+					]]>
+				</if>
+			</otherwise>
+		</choose>
+		<![CDATA[ 
+			ORDER BY M.register_date DESC 
+			LIMIT ${startNum}, ${pageSize}
+		]]>
+	</select>
+	
+	<!-- 목록 갯수  -->
+	<select id="getMemberListCnt" parameterType="CommonVO" resultType="int">
+		<![CDATA[ 
+			SELECT 
+					COUNT(0) AS cnt
+			FROM	tb_user	M
+			LEFT JOIN tb_code C
+			ON	(
+			C.code_id = M.auth
+			AND C.parent_code_id = 'AUTH'
+			AND C.code_use_yn = 'Y'
+			)
+			WHERE	1=1
+		]]>
+		<choose>
+			<when test=" searchType == 'ID' ">
+				<![CDATA[ AND	M.id LIKE CONCAT('%',#{searchWord},'%') ]]>
+			</when>
+			<when test=" searchType == 'NAME' ">
+				<![CDATA[ AND	M.name LIKE CONCAT('%',#{searchWord},'%') ]]>
+			</when>
+			<otherwise>
+				<if test='searchWord != null and searchWord != "" '>
+					<![CDATA[ AND (
+									M.id LIKE CONCAT('%',#{searchWord},'%')
+									OR
+									M.name LIKE CONCAT('%',#{searchWord},'%') 
+									) 
+					]]>
+				</if>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getMemberDetail" parameterType="MemberVO" resultType="MemberVO">
+		<![CDATA[ 
+			SELECT 
+		]]>
+		<include refid="base_member_column" />,
+		<include refid="base_auth_code_column" />
+		<![CDATA[ 
+			FROM	tb_user	M
+			LEFT JOIN tb_code C
+			ON	(
+			C.code_id = M.auth
+			AND C.parent_code_id = 'AUTH'
+			AND C.code_use_yn = 'Y'
+			)
+			WHERE BINARY(id) = #{id}
+		]]>
+	</select>
+	
+	<insert id="setMemberInsert" parameterType="MemberVO">
+		<![CDATA[ 
+			INSERT INTO tb_user
+			(
+				id
+				,password
+				,name
+				,email
+				,auth
+				,password_change_yn
+				,use_yn
+				,department
+				,register_date
+				,register_id
+				,register_ip
+			)VALUES(
+				#{id}
+				,#{password}
+				,#{name}
+				,#{email}
+				,#{auth}
+				,'N'
+				,#{useYn}
+				,#{department}
+				,NOW()
+				,#{registerId}
+				,#{registerIp}
+			)		
+		]]>
+	</insert>
+	
+	<update id="setMemberUpdate" parameterType="MemberVO">
+		<![CDATA[ 
+			UPDATE SET
+				name			=	#{name}
+				,email			=	#{email}
+				,auth			=	#{auth}
+				,use_yn			=	#{useYn}
+				,department		=	#{department}
+				,update_date	=	NOW()
+				,update_id		=	#{updateId}
+				,update_ip		=	#{updateIp}
+			FROM tb_user
+			WHERE id = #{id}
+		]]>
+	</update>
+	
+	<update id="setMemberPasswordUpdate" parameterType="MemberVO">
+		<![CDATA[ 
+			UPDATE SET
+				password		=	#{password} 
+			FROM tb_user
+			WHERE id = #{id}
+		]]>
+	</update>
+	
+	<delete id="setMemberDelete" parameterType="MemberVO">
+		<![CDATA[ 
+			DELETE
+			FROM tb_user
+			WHERE id = #{id}
+		]]>
+	</delete>
+	
+	
+	<!-- 로그인 회원 상세 정보  -->
+	<select id="getLoginDetail" parameterType="MemberVO" resultType="MemberVO">
+		<![CDATA[ 
+			SELECT 
+		]]>
+		<include refid="base_member_column" />
+		<![CDATA[ 
+			FROM	tb_user	M
+			WHERE BINARY(id) = #{id}
+			AND password = #{password}
+		]]>
+	</select>
+	
+</mapper>

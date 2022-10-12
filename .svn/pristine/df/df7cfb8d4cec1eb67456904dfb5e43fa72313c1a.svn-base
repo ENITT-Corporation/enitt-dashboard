@@ -1,0 +1,24 @@
+package kr.co.enitt.poscoWebSystem.service.impl;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.enitt.poscoWebSystem.dao.EventStatsDAO;
+import kr.co.enitt.poscoWebSystem.service.EventStatsService;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.EventStatsVO;
+
+@Service("eventStatsService")
+public class EventStatsServiceImpl implements EventStatsService{
+
+	@Autowired
+	private EventStatsDAO eventStatsDAO;
+	
+	@Override
+	public List<EventStatsVO> getEventStatsDayList(CommonVO vo) throws Exception {
+		return eventStatsDAO.getEventStatsDayList(vo);
+	}
+}

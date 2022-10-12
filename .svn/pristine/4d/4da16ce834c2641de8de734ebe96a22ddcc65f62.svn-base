@@ -1,0 +1,36 @@
+package kr.co.enitt.poscoWebSystem.util;
+
+import java.util.Objects;
+import java.util.Optional;
+
+import kr.co.enitt.poscoWebSystem.vo.MemberVO;
+
+public class AuthenticateHelper {
+	public static boolean isAuthenticated() {
+		return Optional.ofNullable(SessionScopeUtil.getAttribute("memberVO")).map(Objects::nonNull).orElse(false);
+	}
+	
+	public static Object getAuthenticatedUser() {
+		return SessionScopeUtil.getAttribute("memberVO");
+	}
+	
+	public static String getUserId() {	
+		MemberVO memberVO = (MemberVO) Optional.ofNullable(SessionScopeUtil.getAttribute("memberVO")).orElse(new MemberVO());
+		
+		if (memberVO.getMemberId() == null) {
+			return "";
+		} else {
+			return memberVO.getMemberId();
+		}
+	}
+	
+	public static String getAuth() {
+		MemberVO memberVO = (MemberVO) Optional.ofNullable(SessionScopeUtil.getAttribute("memberVO")).orElse(new MemberVO());
+		
+		if (memberVO.getMemberAuth() == null) {
+			return "";
+		} else {
+			return memberVO.getMemberAuth();
+		}
+	}
+}

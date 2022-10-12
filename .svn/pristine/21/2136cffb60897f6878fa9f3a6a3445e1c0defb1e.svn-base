@@ -1,0 +1,18 @@
+package kr.co.enitt.poscoWebSystem.service;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.co.enitt.poscoWebSystem.vo.FileUtilVO;
+import kr.co.enitt.poscoWebSystem.vo.FileVO;
+
+public interface AttachService {
+
+	void createFile(List<Map<String, Object>> list) throws Exception;
+
+	List<FileVO> getFileList(FileUtilVO fileUtilVO) throws Exception;
+	
+	void deleteFile(FileVO fileVO) throws Exception;
+	
+	int updateIdx(FileVO fileVO) throws Exception;
+}

@@ -1,0 +1,109 @@
+let eventId;
+
+$(document).ready(function(){
+	$("#timeStart").datepicker(); 
+	$("#timeEnd").datepicker(); 	
+	
+	var index = $("[name=index]").val();
+
+	if(index > 0){
+		$(".tstyle_list tbody tr").removeClass("selected");
+		$(".tstyle_list tbody tr").eq(index).addClass("selected");
+		var id = $(".tstyle_list tbody tr").eq(index).attr("id");
+		getEventDetail(id);
+		
+	}else{// 이벤트 이력 화면 처음 로딩 시, 가장 최근 이벤트 이력 id를 보냄 
+		$(".tstyle_list tbody tr").eq(0).addClass("selected");
+		var id = $(".tstyle_list tbody tr").eq(0).attr("id");
+		getEventDetail(id);
+	}
+	
+	$(".tstyle_list tbody tr").click(function(){ 	
+		$(".tstyle_list tbody tr").removeClass("selected");
+		$(this).addClass("selected");
+		
+		var id = $(this).attr("id");
+		getEventDetail(id);
+		
+		$("[name=index]").val($(this).index());
+		
+	});
+});
+
+//상세정보 HTML 
+function getEventDetail(eventId){
+	// 목록의 상세정보를 확인할 때, 해당 페이지 목록에서 인덱스가 없을 경우 가장 위의 row로 선택되게 함.
+	if(typeof eventId == "undefined") {
+		eventId = $(".tstyle_list tbody tr:eq(0)").attr("id");		
+		$(".tstyle_list tbody tr:eq(0)").addClass("selected");
+	} 
+	
+	var params = {
+			"eventId" : eventId
+	};
+	
+	rAjaxCall.asyncH("/event/content/ajaxEventDetail", 'POST', params, function(r) {
+		$("#event_detail").html(r);
+	});
+}
+
+
+//이벤트 상태 변경
+function setUpdateEventState() {
+	var eventId = $("#eventStateChange [name='eventId']").val();
+	var eventStateNote = $("#eventStateNote").val();
+	var eventStateCode = $("#eventStateChange [name='eventStateCode']").val();
+	
+	var params = {
+			"eventId" : eventId,
+			"eventStateCode" : eventStateCode,
+			"eventStateNote" : eventStateNote
+	};
+	
+	rAjaxCall.async("/event/ajaxInsertEventStateLog", 'POST', params, function(r) {
+		alert(r.content);
+		popClose('eventStateChange');
+		$("#eventStateNote").val("");
+	});
+}
+
+
+// 검색
+function goSearch() {
+	var eventTimeStart = $("#eventSearch [name=eventTimeStart]").val();
+	var eventTimeEnd = $("#eventSearch [name=eventTimeEnd]").val();
+	if(eventTimeStart > eventTimeEnd){
+		alert("시간의 시작 시간은 종료 시간보다 클 수 없습니다.");
+		$("#eventSearch [name=eventTimeStart]").val('');
+		return;
+	}
+	
+	var eventLocationStart = $("#eventSearch [name=eventLocationStart]").val();
+	var eventLocationEnd = $("#eventSearch [name=eventLocationEnd]").val();
+	if(eventLocationStart != null && eventLocationStart != '' && eventLocationEnd != null && eventLocationEnd != ''){
+		if(Number(eventLocationStart) > Number(eventLocationEnd)){
+			alert("시작 위치는 종료 위치보다 클 수 없습니다.");
+			$("#eventSearch [name=eventLocationStart]").val('');
+			return;
+		}
+	}
+	
+	$('[name=search_form]').submit();
+}
+
+
+
+
+//페이징
+function goPage(page) {
+	$('[name=list_form] [name="pageNo"]').val(page);
+	$('[name=list_form]').submit();
+}
+
+//엑셀 다운
+function excelDown(){
+	$('[name=list_form]').attr('action','/event/excel/list');
+	$('[name=list_form]').submit();
+	$('[name=list_form]').attr('action','/event');
+}
+	

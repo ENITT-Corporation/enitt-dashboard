@@ -1,0 +1,21 @@
+package kr.co.enitt.poscoWebSystem.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.enitt.poscoWebSystem.vo.FileUtilVO;
+import kr.co.enitt.poscoWebSystem.vo.FileVO;
+
+@Mapper
+public interface AttachDAO {
+
+	public void createFile(List<Map<String, Object>> list) throws Exception;
+
+	public List<FileVO> getFileList(FileUtilVO fileUtilVO);
+	
+	public void deleteFile(FileVO fileVO) throws Exception;
+
+	public int updateIdx(FileVO fileVO) throws Exception;
+}

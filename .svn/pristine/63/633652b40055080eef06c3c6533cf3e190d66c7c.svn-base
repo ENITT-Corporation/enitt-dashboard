@@ -1,0 +1,21 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+
+
+@Controller
+public class LoginController {
+
+	@Value("${project.main.page:/}") 
+	private String mainPage;
+	
+	@RequestMapping("/login")
+	public String login() throws Exception {
+		return "redirect:" + mainPage;
+	}
+	
+}

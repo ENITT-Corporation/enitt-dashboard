@@ -1,0 +1,30 @@
+package kr.co.enitt.poscoWebSystem.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.ConveyorVO;
+import kr.co.enitt.poscoWebSystem.vo.EquipmentVO;
+import kr.co.enitt.poscoWebSystem.vo.EventVO;
+import kr.co.enitt.poscoWebSystem.vo.LocationVO;
+
+@Mapper
+public interface DashboardDAO{
+	public List<CommonVO> getEventList();
+	
+	public ConveyorVO getConveyorState() throws Exception;
+	
+	public EquipmentVO getEquipmentState() throws Exception;
+
+	public void setTrendLogCreate(CommonVO commonVO) throws Exception;
+	
+	public EventVO getEvent(CommonVO commonVO) throws Exception;
+	
+	public List<LocationVO> getMarkingList() throws Exception;
+
+	public List<EventVO> getEventLogCnt();
+	
+	public List<LocationVO> getMarkingCheckList();
+}

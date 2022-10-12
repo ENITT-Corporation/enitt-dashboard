@@ -1,0 +1,28 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<div class="dashboardImg">		
+	<div class="conveyor_popup">
+		<jsp:include page="./dashboard/conveyor.jsp" />
+	</div>
+	
+	<div class="equipment">
+		<jsp:include page="./dashboard/equipment_state.jsp" />
+	</div>
+	
+	<div class="das_event">
+		<jsp:include page="./dashboard/das_event.jsp" />
+	</div>
+	
+	<!-- 이벤트 팝업(알림) 세팅 -->
+	<div class="event_popup_div DiNone">
+		<jsp:include page="./dashboard/event_popup.jsp" />
+	</div>
+	<div class="event_popup_click"></div>
+	<div class="event_popup_focus"></div>
+	
+	<!-- 이벤트 상태 변경 팝업 세팅 -->
+	<div class="state_popup_content">
+		 <%-- <jsp:include page="./dashboard/state_popup.jsp" />    --%>
+	</div>
+</div>

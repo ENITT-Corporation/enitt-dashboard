@@ -1,0 +1,15 @@
+package kr.co.enitt.poscoWebSystem.service;
+
+import java.util.HashMap;
+import java.util.List;
+
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.EventVO;
+
+public interface EventStatsService {
+
+	// 이벤트 통계 - 세로 막대 그래프
+	HashMap<String, Object> getEventStatsDayList(CommonVO vo) throws Exception;
+	HashMap<String, Object> getEventStatsMonthList(CommonVO vo) throws Exception;
+	HashMap<String, Object> getEventStatsYearList(CommonVO vo) throws Exception;
+}

@@ -1,0 +1,14 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jstl/jstl.jsp"%>
+
+<c:set var="heightStart" value="${750}" />
+<c:set var="height" value="${746}" />
+<input type="hidden" id="eventLastTime" value="${commonVO.eventLastTime}" />
+<ul>
+	<c:forEach var="data" items="${dasEventList}" varStatus="status">
+		<c:set var="das_top" value="${heightStart-(height/1000*data.eventLocation)}"/>
+		<li class="<c:out value="${commonVO.dashboard_dasEventId eq data.eventId ? 'selected':''}" />" id="<c:out value="${data.eventId}" />" style="top:<c:out value="${das_top}" />px;"></li>
+	</c:forEach>
+</ul>
+
+<script src='<c:out value="${pageContext.request.contextPath}" />/resources/js/custom/dashboard/das_event.js'></script>

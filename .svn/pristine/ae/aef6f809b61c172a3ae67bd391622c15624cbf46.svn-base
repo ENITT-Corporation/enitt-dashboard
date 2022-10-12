@@ -1,0 +1,287 @@
+package kr.co.enitt.poscoWebSystem.controller;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.co.enitt.poscoWebSystem.service.CodeService;
+import kr.co.enitt.poscoWebSystem.service.DashboardService;
+import kr.co.enitt.poscoWebSystem.service.EventService;
+import kr.co.enitt.poscoWebSystem.util.ObjectUtil;
+import kr.co.enitt.poscoWebSystem.vo.CodeVO;
+import kr.co.enitt.poscoWebSystem.vo.CommonVO;
+import kr.co.enitt.poscoWebSystem.vo.ConveyorVO;
+import kr.co.enitt.poscoWebSystem.vo.EquipmentVO;
+
+
+/**
+* @Project : poscoWebSystem
+* @FileName : DashboardController.java
+* @Author : ENITT_KHR
+* @Date : 2022. 07. 05. 
+* @Description : 대시보드
+* ===========================================================
+* DATE                   AUTHOR                     NOTE
+* -----------------------------------------------------------
+* 2022. 07. 05.        ENITT      최초작성
+*/
+@Controller 
+@RequestMapping("/dashboard")
+public class DashboardController {
+
+	@Resource(name = "dashboardService")
+	private DashboardService dashboardService;
+	
+	@Resource(name = "eventService")
+	private EventService eventService;
+	
+	@Resource(name = "codeService")
+	private CodeService codeService;
+
+		
+	/**
+	  * @Method_Name : main
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 05.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 대시보드 화면 호출
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 05. ENITT_KHR : 생성
+	  */
+	@RequestMapping(value= {"","/"})
+	public ModelAndView main(HttpServletRequest request, CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		request.setCharacterEncoding("UTF-8");
+		
+		// 이벤트 상태 변경 selectBox
+		vo.setParentCode("STATE");
+		List<CodeVO> eventStateSearchList = codeService.getCodeList(vo);
+		mav.addObject("eventStateSearchList", eventStateSearchList);
+		
+		mav.setViewName("dashboard/main");    
+		return mav;
+	}	
+	
+	/**
+	  * @Method_Name : ajaxEventList
+	  * @return :ModelAndView
+	  * @Date : 2022. 08. 01.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 대시보드의 이벤트 목록 출력
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 08. 01. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/ajaxEventList")
+	public @ResponseBody ModelAndView ajaxEventList(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+
+		vo.setNow(ObjectUtil.getNow("",0)); // 현재 시간
+		// 이벤트 목록
+	    List<CommonVO> list = eventService.getEventList(vo);
+	    vo.setTotalCount(list.size()); 
+	    mav.addObject("eventList", list);
+		
+		mav.addObject("commonVO", vo);	
+		mav.setViewName("dashboard/content/event_list");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxEventCnt
+	  * @return :Object
+	  * @Date : 2022. 07. 28.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 알림 갯수
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 28. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/ajaxEventCnt")
+	public @ResponseBody Object ajaxEventCnt(CommonVO vo) throws Exception {
+		HashMap<String,Object> result = new HashMap<String,Object>();
+		
+		vo.setNow(ObjectUtil.getNow("",0)); // 현재 시간
+		String timeStr = ObjectUtil.getNow("SECOND", -4);		
+		
+		vo.setEventLastTime(timeStr);
+		int eventNewCnt = eventService.getEventListCnt(vo);
+		result.put("eventNewCnt", eventNewCnt);
+		
+		vo.setEventLastTime("");
+		int eventCnt = eventService.getEventListCnt(vo);
+		result.put("eventCnt", eventCnt);
+		
+		return result;
+	}
+	
+	/**
+	  * @Method_Name : ajaxEvent
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 28.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 알림 아이콘 출력
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 28. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/ajaxEvent")
+	public @ResponseBody ModelAndView ajaxEvent(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		vo.setNow(ObjectUtil.getNow("",0));
+		List<CommonVO> dasEventList = eventService.getEventList(vo);
+		mav.addObject("dasEventList", dasEventList);
+	
+		if(ObjectUtil.isNotEmpty(dasEventList)) {
+			if(vo.getDashboard_dasEventId() == null || vo.getDashboard_dasEventId().equals("")) {
+				vo.setDashboard_dasEventId(dasEventList.get(0).getEventId());
+			}
+			vo.setEventLastTime(dasEventList.get(0).getEventTime());
+		}
+		
+
+		mav.addObject("commonVO", vo);
+		mav.setViewName("dashboard/content/dashboard/das_event");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxEventAlarm
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 28.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 알림창 출력
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 28. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/ajaxEventAlarm")
+	public @ResponseBody ModelAndView ajaxEventAlarm(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		vo.setNow(ObjectUtil.getNow("",0)); 
+		List<CommonVO> dasEventList = eventService.getEventList(vo);
+		mav.addObject("dasEventList", dasEventList);
+		
+		if(ObjectUtil.isNotEmpty(dasEventList)) {
+			if(vo.getDashboard_dasEventId() == null || vo.getDashboard_dasEventId().equals("")) {
+				vo.setDashboard_dasEventId(dasEventList.get(0).getEventId());
+			}
+		}
+		
+		mav.setViewName("dashboard/content/dashboard/event_popup");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxEquipmenState
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 27.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : DAS 장비 상태 확인
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 27. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/equipmentState")
+	public @ResponseBody ModelAndView ajaxEquipmenState(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		// DAS 장비 상태
+		EquipmentVO equipVO = dashboardService.getEquipmentState();
+		mav.addObject("equipmentVO", equipVO);
+		
+		mav.setViewName("dashboard/content/dashboard/equipment_state");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxConveyorState
+	  * @return :ModelAndView
+	  * @Date : 2022. 07. 27.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 컨베이어 벨트 상태 확인
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 07. 27. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/conveyorState")
+	public @ResponseBody ModelAndView ajaxConveyorState(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();		
+		LocalDateTime now = LocalDateTime.now();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");			
+		
+		// 컨베이어 벨트 상태
+		ConveyorVO conveyorVO = dashboardService.getConveyorState();
+		
+		// 가동시간 계산
+		String formatNow = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		long curDateTime = dateFormat.parse(formatNow).getTime();
+		Date conveyorTime = dateFormat.parse(conveyorVO.getConveyorStateTime());
+		long conDateTime = conveyorTime.getTime();
+		long hour = (curDateTime - conDateTime) / 3600000;
+		conveyorVO.setConveyorTimeDiff(hour);
+		
+		mav.addObject("conveyorVO", conveyorVO);	
+		mav.setViewName("dashboard/content/dashboard/conveyor");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxEventPop
+	  * @return :ModelAndView
+	  * @Date : 2022. 08. 05.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 목록 - 이벤트 발생 알림 메시지 노출
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 08. 05. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/ajaxEventPop")
+	public @ResponseBody ModelAndView ajaxEventPop(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		vo = eventService.getEventPopupDetail(vo);
+		mav.addObject("commonVO", vo);
+		
+		mav.setViewName("dashboard/content/dashboard/event_popup");
+		return mav;
+	}
+	
+	/**
+	  * @Method_Name : ajaxStatePopupOpen
+	  * @return :ModelAndView
+	  * @Date : 2022. 08. 19.
+	  * @Author : ENITT_KHR
+	  * @Method_Description : 이벤트 목록 - 상태 변경 팝업 노출
+	  * ---------------------
+	  * @변경이력
+	  * 2022. 08. 19. ENITT_KHR : 생성
+	  */
+	@RequestMapping("/content/ajaxStatePopupOpen")
+	public @ResponseBody ModelAndView ajaxPopupOpen(CommonVO vo) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		// selectBox
+		vo.setParentCode("STATE");
+		List<CodeVO> eventStateList = codeService.getCodeList(vo);
+		mav.addObject("eventStateList", eventStateList);
+
+		mav.addObject("commonVO", vo);		
+		mav.setViewName("dashboard/content/dashboard/state_popup");
+		return mav;
+	}
+	
+}

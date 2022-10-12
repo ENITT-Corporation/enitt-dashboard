@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee " xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance "
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee  http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd "
+	version="2.0">
+	<description>JSTL 1.1 functions library</description>
+	<display-name>JSTL functions</display-name>
+	<tlib-version>1.1</tlib-version>
+	<short-name>fileUtil</short-name>
+	
+	<function>
+		<description></description>
+		<name>getImgSize</name>
+		<function-class>kr.co.enitt.poscoWebSystem.util.FileUtil</function-class>
+		<function-signature>String getImgSize(java.lang.Integer)</function-signature>
+		<example>
+			${ fileUtil:getImgSize() }
+		</example>
+	</function>
+	
+	<function>
+		<description></description>
+		<name>attachFileHtml</name>
+		<function-class>kr.co.enitt.poscoWebSystem.util.FileUtil</function-class>
+		<function-signature>String attachFileHtml(kr.co.enitt.poscoWebSystem.vo.FileUtilVO)</function-signature>
+		<example>
+			${ fileUtil:attachFileHtml() }
+		</example>
+	</function>
+	
+	<function>
+		<description></description>
+		<name>getFileListHtml</name>
+		<function-class>kr.co.enitt.poscoWebSystem.util.FileUtil</function-class>
+		<function-signature>String getFileListHtml(kr.co.enitt.poscoWebSystem.vo.FileUtilVO)</function-signature>
+		<example>
+			${ fileUtil:getFileListHtml() }
+		</example>
+	</function>
+	
+	<function>
+		<description></description>
+		<name>updateBtnHtml</name>
+		<function-class>kr.co.enitt.poscoWebSystem.util.FileUtil</function-class>
+		<function-signature>String updateBtnHtml(kr.co.enitt.poscoWebSystem.vo.FileUtilVO)</function-signature>
+		<example>
+			${ fileUtil:updateBtnHtml() }
+		</example>
+	</function>
+	
+	<function>
+		<description></description>
+		<name>setFileType</name>
+		<function-class>kr.co.enitt.poscoWebSystem.util.FileUtil</function-class>
+		<function-signature>Object setFileType(kr.co.enitt.poscoWebSystem.vo.FileUtilVO)</function-signature>
+		<example>
+			${ fileUtil:setFileType() }
+		</example>
+	</function>
+</taglib>
